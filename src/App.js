@@ -8,6 +8,7 @@ import {
   Redirect,
 } from "react-router-dom";
 import axios from "axios";
+import ReactLoading from "react-loading";
 import Header from "./components/layout/Header";
 import Login from "./components/Login";
 import Dashboard from "./components/Dashboard";
@@ -16,6 +17,14 @@ import Class from "./components/Class";
 function App(props) {
   let history = useHistory();
   const [authenticated, setAuthenticated] = useState(false);
+  const [loading, setloading] = useState(true);
+  const style = {
+    position: "fixed",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+  };
+
   useEffect(() => {
     fetch(
       "/authentication"
@@ -36,15 +45,27 @@ function App(props) {
       .then((responseJson) => {
         if (responseJson.authenticated) {
           setAuthenticated(true);
+          setloading(false);
         } else {
           setAuthenticated(false);
+          setloading(false);
         }
       })
       .catch((error) => {
         setAuthenticated(false);
+        setloading(false);
         console.log(error);
       });
   }, []);
+
+  if (loading) {
+    return (
+      <div style={style}>
+        {" "}
+        <ReactLoading type={"bars"} color={"grey"} />
+      </div>
+    );
+  }
 
   return (
     <Router>
