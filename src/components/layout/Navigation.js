@@ -20,7 +20,7 @@ export default class Navigation extends Component {
 
   render() {
     return (
-      <div className="mt-5" style={{ backgroundColor: "#EC3545" }}>
+      <div className="mt-5" style={{ backgroundColor: "#007bff" }}>
         <MDBNavbar dark expand="md">
           <MDBNavbarToggler onClick={this.toggleCollapse} />
           <MDBCollapse id="navbarCollapse3" isOpen={this.state.isOpen} navbar>

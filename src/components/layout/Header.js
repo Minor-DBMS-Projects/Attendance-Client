@@ -10,13 +10,14 @@ export default class Header extends Component {
     //     return null;
     //else
     return (
-      <div className="bg-danger z-depth-2">
-        <h1 className="mt-2 p-3 d-flex justify-content-center text-white">
+      <div className="bg-primary z-depth-3">
+        <h1 className=" p-3 d-flex justify-content-center text-white">
           Institute of Engineering
         </h1>
-        <h4 className="mt-2 d-flex justify-content-center text-white">
+        <h4 className="mt-1 p-0 d-flex justify-content-center text-white">
           Pulchowk Campus
         </h4>
+
         <Navigation />
       </div>
     );
