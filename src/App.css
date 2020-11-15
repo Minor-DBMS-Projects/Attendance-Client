@@ -1,6 +1,6 @@
 .btn {
-  padding: 0px;
-  text-transform: unset !important;
+  text-transform: capitalize !important;
+  width: 200px;
 }
 .parent {
   display: flex;

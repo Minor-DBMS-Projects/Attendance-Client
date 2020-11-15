@@ -1,14 +1,14 @@
 import React, { Component } from "react";
+import { withRouter } from "react-router-dom";
 import Navigation from "./Navigation";
 import "mdbreact/dist/css/mdb.css";
 
-export default class Header extends Component {
+class Header extends Component {
   j;
   render() {
     const { location } = this.props;
-    // if (location.pathname.match('/report'))
-    //     return null;
-    //else
+    // if (location.pathname.match("/history")) return null;
+    // else
     return (
       <div className="bg-primary z-depth-3">
         <h1 className=" p-3 d-flex justify-content-center text-white">
@@ -23,3 +23,5 @@ export default class Header extends Component {
     );
   }
 }
+
+export default withRouter(Header);

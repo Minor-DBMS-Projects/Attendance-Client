@@ -7,6 +7,7 @@ import {
   MDBNavbarToggler,
   MDBCollapse,
   MDBIcon,
+  MDBBtn,
 } from "mdbreact";
 
 export default class Navigation extends Component {
@@ -25,20 +26,35 @@ export default class Navigation extends Component {
           <MDBNavbarToggler onClick={this.toggleCollapse} />
           <MDBCollapse id="navbarCollapse3" isOpen={this.state.isOpen} navbar>
             <MDBNavbarNav left>
-              <MDBNavItem>
-                <MDBNavLink to="/" exact>
-                  Home
-                </MDBNavLink>
-              </MDBNavItem>
-              <MDBNavItem>
-                <MDBNavLink to="/classes">Class</MDBNavLink>
-              </MDBNavItem>
-              <MDBNavItem>
-                <MDBNavLink to="/instructor">Instructor</MDBNavLink>
-              </MDBNavItem>
-              <MDBNavItem>
-                <MDBNavLink to="/batch">Batch</MDBNavLink>
-              </MDBNavItem>
+              <MDBBtn color="primary">
+                <MDBNavItem>
+                  <MDBNavLink to="/" exact>
+                    Home
+                  </MDBNavLink>
+                </MDBNavItem>
+              </MDBBtn>
+              <MDBBtn color="primary">
+                <MDBNavItem>
+                  <MDBNavLink to="/addnewclass" exact>
+                    Add new class
+                  </MDBNavLink>
+                </MDBNavItem>
+              </MDBBtn>
+              <MDBBtn color="primary">
+                <MDBNavItem>
+                  <MDBNavLink to="/classes">Class</MDBNavLink>
+                </MDBNavItem>
+              </MDBBtn>
+              <MDBBtn color="primary">
+                <MDBNavItem>
+                  <MDBNavLink to="/instructor">Instructor</MDBNavLink>
+                </MDBNavItem>
+              </MDBBtn>
+              <MDBBtn color="primary">
+                <MDBNavItem>
+                  <MDBNavLink to="/batch">Batch</MDBNavLink>
+                </MDBNavItem>
+              </MDBBtn>
             </MDBNavbarNav>
             <MDBNavbarNav right>
               <MDBNavItem>
