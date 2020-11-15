@@ -13,6 +13,7 @@ import Header from "./components/layout/Header";
 import Login from "./components/Login";
 import Dashboard from "./components/Dashboard";
 import Class from "./components/Class";
+import AttendanceHistory from "./components/AttendanceHistory";
 
 function App(props) {
   let history = useHistory();
@@ -88,6 +89,14 @@ function App(props) {
           <Route exact path="/classes">
             {authenticated ? <Class /> : <Redirect to="/" />}
           </Route>
+          <Route exact path="/history/:classId/:subjectCode/:classType">
+            {authenticated ? (
+              <AttendanceHistory {...props} />
+            ) : (
+              <Redirect to="/" />
+            )}
+          </Route>
+
           <Route exact path="/success">
             <h1>Logged in successfully</h1>
           </Route>
