@@ -10,6 +10,7 @@ import {
   MDBBtn,
 } from "mdbreact";
 import "../App.css";
+import ClassList from "./ClassList";
 
 const Dashboard = () => {
   const [attendanceData, setattendanceData] = useState([]);
@@ -36,27 +37,8 @@ const Dashboard = () => {
       <h4>My Classes</h4>
       <hr />
       <MDBListGroup className=" ">
-        {attendanceData.map((attendance) => (
-          <div className="child">
-            <MDBListGroupItem hover href="#">
-              <div
-                className="d-flex w-100 justify-content-between"
-                style={{ color: "#007bff" }}
-              >
-                <h5 className="mb-1">{attendance.subject}</h5>
-                <small>{attendance.program}</small>
-              </div>
-
-              <p className="mb-1">
-                <strong>Program</strong>: {attendance.program}
-                <br />
-                <strong>Batch</strong>: {attendance.batch}
-                <br />
-                <strong>Section</strong>: {attendance.section}
-              </p>
-              <small>Donec id elit non mi porta.</small>
-            </MDBListGroupItem>
-          </div>
+        {attendanceData.map((attendance, index) => (
+          <ClassList key={index} attendance={attendance} />
         ))}
       </MDBListGroup>
     </MDBContainer>
