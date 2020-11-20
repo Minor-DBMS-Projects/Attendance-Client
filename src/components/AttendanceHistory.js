@@ -13,7 +13,7 @@ import {
 
 import DeleteButton from "./DeleteButton";
 
-//var trecords = {};
+//var trecords = {};undefined
 
 const AttendanceHistory = (props) => {
   const [counts, setCounts] = useState({});
@@ -30,6 +30,7 @@ const AttendanceHistory = (props) => {
   const classId = props.match.params.classId;
   const subjectCode = props.match.params.subjectCode;
   const classType = props.match.params.classType;
+  const attendance = props.location.state.attendance;
   useEffect(() => {
     axios
       .get(`/attendance/all/${classId}/${subjectCode}/${classType}`)
@@ -140,14 +141,26 @@ const AttendanceHistory = (props) => {
   };
 
   var deleteRecord = (i) => {
-    var recs = { ...records };
-    delete recs[i];
-    setRecords(recs);
+    //var recs = { ...records };
+    const { [i]: remove, ...rest } = records;
+    setRecords(rest);
+    //recs[i] = undefined;
+    //console.log(remove);
+    //console.log(rest);
+    // const recs = Object.keys(records).reduce((object, key) => {
+    //   if (key !== i) {
+    //     object[key] = records[key];
+    //   }
+    //   return object;
+    // }, {});
+
+    console.log(rest);
+    setRecords(rest);
     console.log(records);
     var c = updateCount();
     setCounts(c);
-    console.log(counts);
-    console.log(records);
+    // console.log(counts);
+    // console.log(records);
 
     axios
       .get(`/attendance/delete/${i}`)
@@ -156,6 +169,7 @@ const AttendanceHistory = (props) => {
   };
 
   const updateCount = () => {
+    //console.log(records);
     var count = {};
     students.forEach((student) => {
       var c = 0;
@@ -170,6 +184,18 @@ const AttendanceHistory = (props) => {
   };
   return (
     <div>
+      <br />
+      <p>
+        <strong>Subject: </strong>
+        {attendance.subject}(
+        {attendance.classType == "L" ? "Lecture" : "Practical"})
+      </p>
+      <p>
+        <strong>Batch: </strong>
+        {attendance.batch}
+        {attendance.program}
+        (Section {attendance.section})
+      </p>
       <MDBBtn
         color="primary"
         style={{ width: "fit-content" }}
@@ -229,8 +255,16 @@ const AttendanceHistory = (props) => {
         <MDBTableBody>
           {students.map((student, index) => (
             <tr key={student.roll_no}>
-              <td>{student.roll_no}</td>
-              <td>{student.name}</td>
+              <td>
+                <strong style={{ "font-weight": "bold" }}>
+                  {student.roll_no}
+                </strong>
+              </td>
+              <td>
+                <strong style={{ "font-weight": "bold" }}>
+                  {student.name}
+                </strong>
+              </td>
               {Object.keys(records).length > 0
                 ? Object.keys(records).map((i) => (
                     <td>
@@ -251,15 +285,26 @@ const AttendanceHistory = (props) => {
                           onChange={() => handleChange(i, student.roll_no)}
                         />
                       ) : records[i].students.includes(student.roll_no) ? (
-                        "P"
+                        <strong
+                          style={{ color: "green", "font-weight": "bold" }}
+                        >
+                          {" "}
+                          P
+                        </strong>
                       ) : (
-                        "A"
+                        <strong style={{ color: "red", "font-weight": "bold" }}>
+                          A
+                        </strong>
                       )}
                     </td>
                   ))
                 : null}
               {Object.keys(records).length > 0 ? (
-                <td>{counts[student.roll_no] ? counts[student.roll_no] : 0}</td>
+                <td>
+                  <strong style={{ "font-weight": "bold" }}>
+                    {counts[student.roll_no] ? counts[student.roll_no] : 0}
+                  </strong>
+                </td>
               ) : null}
             </tr>
           ))}
