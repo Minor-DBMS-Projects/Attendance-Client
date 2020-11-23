@@ -89,10 +89,7 @@ const ClassList = (props) => {
             <strong>Section</strong>: {props.attendance.section}
           </p>
           <Link
-            to={{
-              pathname: `/history/${props.attendance.class}/${props.attendance.subjectCode}/${props.attendance.classType}`,
-              state: { attendance: props.attendance },
-            }}
+            to={`/history/${props.attendance.class}/${props.attendance.subjectCode}/${props.attendance.classType}`}
           >
             <MDBBtn color="primary" style={{ color: "white" }}>
               Attendance history
