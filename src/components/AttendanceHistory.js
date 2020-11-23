@@ -30,26 +30,32 @@ const AttendanceHistory = (props) => {
   const classId = props.match.params.classId;
   const subjectCode = props.match.params.subjectCode;
   const classType = props.match.params.classType;
-  const attendance = props.location.state.attendance;
+
   useEffect(() => {
     axios
       .get(`/attendance/all/${classId}/${subjectCode}/${classType}`)
       .then((res) => {
+        //console.log(res);
         console.log(res.data);
         var recs = res.data.records;
         Object.keys(recs).map((i) => {
           recs[i].editable = false;
         });
         //var recs_copy = { ...recs };
-        setCounts(res.data.counts);
+        setStudents(res.data.students);
         setDetails(res.data.details);
         setRecords(recs);
-        console.log(res);
-        setStudents(res.data.students);
+
+        //setCounts(res.data.counts);
       })
       .catch((err) => console.log(err));
-  }, []);
+  }, [classId, subjectCode, classType]);
   //console.log(props.match);
+
+  useEffect(() => {
+    console.log("Calleddd");
+    setCounts(updateCount());
+  }, [records]);
 
   const changeEditable = (i) => {
     console.log("change editable called");
@@ -123,10 +129,6 @@ const AttendanceHistory = (props) => {
     setPresent([]);
     setAbsent([]);
     setVisited([]);
-    var c = updateCount();
-    setCounts(c);
-    //setTemprecords(recs);
-    console.log(records);
 
     const requestOptions = {
       method: "POST",
@@ -141,25 +143,19 @@ const AttendanceHistory = (props) => {
   };
 
   var deleteRecord = (i) => {
-    //var recs = { ...records };
-    const { [i]: remove, ...rest } = records;
-    setRecords(rest);
-    //recs[i] = undefined;
-    //console.log(remove);
-    //console.log(rest);
-    // const recs = Object.keys(records).reduce((object, key) => {
-    //   if (key !== i) {
-    //     object[key] = records[key];
-    //   }
-    //   return object;
-    // }, {});
+    setRecords(
+      Object.keys(records)
+        .filter((key) => key != i)
+        .reduce((result, current) => {
+          result[current] = records[current];
+          return result;
+        }, {})
+    );
+    //console.log(records);
+    //console.log([records]);
 
-    console.log(rest);
-    setRecords(rest);
-    console.log(records);
-    var c = updateCount();
-    setCounts(c);
-    // console.log(counts);
+    //setCounts(updateCount());
+    //console.log(counts);
     // console.log(records);
 
     axios
@@ -185,17 +181,18 @@ const AttendanceHistory = (props) => {
   return (
     <div>
       <br />
+
       <p>
         <strong>Subject: </strong>
-        {attendance.subject}(
-        {attendance.classType == "L" ? "Lecture" : "Practical"})
+        {details.subjectName}({details.type == "L" ? "Lecture" : "Practical"})
       </p>
       <p>
         <strong>Batch: </strong>
-        {attendance.batch}
-        {attendance.program}
-        (Section {attendance.section})
+        {details.batch}
+        {details.program}
+        (Section {details.section})
       </p>
+
       <MDBBtn
         color="primary"
         style={{ width: "fit-content" }}
@@ -256,14 +253,12 @@ const AttendanceHistory = (props) => {
           {students.map((student, index) => (
             <tr key={student.roll_no}>
               <td>
-                <strong style={{ "font-weight": "bold" }}>
+                <strong style={{ fontWeight: "bold" }}>
                   {student.roll_no}
                 </strong>
               </td>
               <td>
-                <strong style={{ "font-weight": "bold" }}>
-                  {student.name}
-                </strong>
+                <strong style={{ fontWeight: "bold" }}>{student.name}</strong>
               </td>
               {Object.keys(records).length > 0
                 ? Object.keys(records).map((i) => (
@@ -285,14 +280,12 @@ const AttendanceHistory = (props) => {
                           onChange={() => handleChange(i, student.roll_no)}
                         />
                       ) : records[i].students.includes(student.roll_no) ? (
-                        <strong
-                          style={{ color: "green", "font-weight": "bold" }}
-                        >
+                        <strong style={{ color: "green", fontWeight: "bold" }}>
                           {" "}
                           P
                         </strong>
                       ) : (
-                        <strong style={{ color: "red", "font-weight": "bold" }}>
+                        <strong style={{ color: "red", fontWeight: "bold" }}>
                           A
                         </strong>
                       )}
@@ -301,7 +294,7 @@ const AttendanceHistory = (props) => {
                 : null}
               {Object.keys(records).length > 0 ? (
                 <td>
-                  <strong style={{ "font-weight": "bold" }}>
+                  <strong style={{ fontWeight: "bold" }}>
                     {counts[student.roll_no] ? counts[student.roll_no] : 0}
                   </strong>
                 </td>
