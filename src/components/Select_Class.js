@@ -214,20 +214,39 @@ const Select_Class = (props) => {
         }
         formBody = formBody.join("&");
         axios
-            .post("/attendance/take", formBody, {
+            .post("/backend/attendance/take", formBody, {
                 headers: {
                     "Content-Type":
                         "application/x-www-form-urlencoded;charset=UTF-8",
                 },
             })
-            .then((response) =>
-                props.history.push({
-                    pathname: "/new/student/namelist",
-                    state: {
-                        data: response.data,
-                    },
-                })
-            );
+
+            .then((response) => {
+                if (
+                    response.data.classes === undefined ||
+                    response.data.classes.length === 0
+                ) {
+                    alert("Couldn't fetch classes");
+                } else if (
+                    response.data.subjects === undefined ||
+                    response.data.subjects.length === 0
+                ) {
+                    alert("Couldn't fetch subjects");
+                } else if (
+                    response.data.students === undefined ||
+                    response.data.students.length === 0
+                ) {
+                    alert("Couldn't fetch students");
+                } else {
+                    props.history.push({
+                        pathname: "/new/student/namelist",
+                        state: {
+                            data: response.data,
+                        },
+                    });
+                }
+            })
+            .catch((error) => console.log(error));
     }
 
     return (

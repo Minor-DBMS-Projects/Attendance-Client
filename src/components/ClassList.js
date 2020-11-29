@@ -36,7 +36,7 @@ const ClassList = (props) => {
         }
         formBody = formBody.join("&");
         axios
-            .post("/student/namelist", formBody, {
+            .post("/backend/student/namelist", formBody, {
                 headers: {
                     "Content-Type":
                         "application/x-www-form-urlencoded;charset=UTF-8",

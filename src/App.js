@@ -15,6 +15,7 @@ import Dashboard from "./components/Dashboard";
 import Select_Class from "./components/Select_Class";
 import AttendanceHistory from "./components/AttendanceHistory";
 import TakeAttendance from "./components/TakeAttendance";
+import ClassDetails from "./components/ClassDetails";
 
 function App(props) {
     let history = useHistory();
@@ -29,7 +30,7 @@ function App(props) {
 
     useEffect(() => {
         fetch(
-            "/authentication"
+            "/backend/authentication"
             // , {
             //   method: "GET",
             //   credentials: "include",
@@ -89,6 +90,9 @@ function App(props) {
                     </Route>
                     <Route exact path="/classes">
                         {authenticated ? <Select_Class /> : <Redirect to="/" />}
+                    </Route>
+                    <Route exact path="/takeAttendance">
+                        {authenticated ? <ClassDetails /> : <Redirect to="/" />}
                     </Route>
                     <Route
                         exact

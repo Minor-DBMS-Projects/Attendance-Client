@@ -39,8 +39,8 @@ export default class Navigation extends Component {
                             </MDBBtn>
                             <MDBBtn color="primary">
                                 <MDBNavItem>
-                                    <MDBNavLink to="/addnewclass" exact>
-                                        Add new class
+                                    <MDBNavLink to="/takeAttendance" exact>
+                                        Take Attendance
                                     </MDBNavLink>
                                 </MDBNavItem>
                             </MDBBtn>

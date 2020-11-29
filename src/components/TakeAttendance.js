@@ -98,7 +98,7 @@ function TakeAttendance(props) {
         }
         formBody = formBody.join("&");
         axios
-            .post("/attendance/submit", formBody, {
+            .post("/backend/attendance/submit", formBody, {
                 headers: {
                     "Content-Type":
                         "application/x-www-form-urlencoded;charset=UTF-8",
