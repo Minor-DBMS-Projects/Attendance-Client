@@ -9,14 +9,28 @@ import {
     MDBIcon,
     MDBBtn,
 } from "mdbreact";
+import { withRouter } from "react-router-dom";
+import axios from "axios";
 
-export default class Navigation extends Component {
+class Navigation extends Component {
     state = {
         isOpen: false,
     };
 
     toggleCollapse = () => {
         this.setState({ isOpen: !this.state.isOpen });
+    };
+
+    logout = () => {
+        this.props.setloading(true);
+        axios
+            .get("/backend/logout")
+            .then(() => {
+                this.props.setAuthenticated(!this.props.authenticated);
+                this.props.history.push("/");
+                this.props.setloading(false);
+            })
+            .catch((err) => console.log(err));
     };
 
     render() {
@@ -39,7 +53,7 @@ export default class Navigation extends Component {
                             </MDBBtn>
                             <MDBBtn color="primary">
                                 <MDBNavItem>
-                                    <MDBNavLink to="/takeAttendance" exact>
+                                    <MDBNavLink to="/class-details" exact>
                                         Take Attendance
                                     </MDBNavLink>
                                 </MDBNavItem>
@@ -64,19 +78,20 @@ export default class Navigation extends Component {
                                 </MDBNavItem>
                             </MDBBtn>
                         </MDBNavbarNav>
-                        <MDBNavbarNav right>
-                            <MDBNavItem>
-                                <MDBNavLink
-                                    className="waves-effect waves-light"
-                                    to="/form"
-                                >
-                                    <MDBIcon far icon="user" size="2x" />
-                                </MDBNavLink>
-                            </MDBNavItem>
-                        </MDBNavbarNav>
+                        {this.props.authenticated ? (
+                            <MDBNavbarNav right>
+                                <MDBNavItem>
+                                    <MDBBtn onClick={this.logout}>
+                                        <MDBNavLink to=""> Logout</MDBNavLink>
+                                    </MDBBtn>
+                                </MDBNavItem>
+                            </MDBNavbarNav>
+                        ) : null}
                     </MDBCollapse>
                 </MDBNavbar>
             </div>
         );
     }
 }
+
+export default withRouter(Navigation);

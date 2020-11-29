@@ -7,7 +7,14 @@ class Header extends Component {
   j;
   render() {
     const { location } = this.props;
-    if (location.pathname.match("/history")) return <Navigation />;
+    if (location.pathname.match("/history"))
+      return (
+        <Navigation
+          authenticated={this.props.authenticated}
+          setAuthenticated={this.props.setAuthenticated}
+          setloading={this.props.setloading}
+        />
+      );
     else
       return (
         <div className="bg-primary z-depth-3">
@@ -18,7 +25,11 @@ class Header extends Component {
             Pulchowk Campus
           </h4>
 
-          <Navigation />
+          <Navigation
+            authenticated={this.props.authenticated}
+            setAuthenticated={this.props.setAuthenticated}
+            setloading={this.props.setloading}
+          />
         </div>
       );
   }

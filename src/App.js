@@ -7,7 +7,6 @@ import {
     useHistory,
     Redirect,
 } from "react-router-dom";
-import axios from "axios";
 import ReactLoading from "react-loading";
 import Header from "./components/layout/Header";
 import Login from "./components/Login";
@@ -30,7 +29,7 @@ function App(props) {
 
     useEffect(() => {
         fetch(
-            "/backend/authentication"
+            "/authentication"
             // , {
             //   method: "GET",
             //   credentials: "include",
@@ -73,7 +72,11 @@ function App(props) {
     return (
         <Router>
             <div className="container-fluid">
-                <Header />
+                <Header
+                    authenticated={authenticated}
+                    setAuthenticated={setAuthenticated}
+                    setloading={setloading}
+                />
                 <Switch>
                     <Route exact path="/">
                         {authenticated ? (
@@ -88,11 +91,11 @@ function App(props) {
                     <Route exact path="/dashboard">
                         {authenticated ? <Dashboard /> : <Redirect to="/" />}
                     </Route>
+                    <Route exact path="/class-details">
+                        {authenticated ? <ClassDetails /> : <Redirect to="/" />}
+                    </Route>
                     <Route exact path="/classes">
                         {authenticated ? <Select_Class /> : <Redirect to="/" />}
-                    </Route>
-                    <Route exact path="/takeAttendance">
-                        {authenticated ? <ClassDetails /> : <Redirect to="/" />}
                     </Route>
                     <Route
                         exact
