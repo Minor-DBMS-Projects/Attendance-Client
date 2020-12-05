@@ -5,7 +5,7 @@ import axios from "axios";
 import { withRouter } from "react-router-dom";
 var APICall = require("./utilities/APICall");
 
-const ClassDetails = (props) => {
+const OnlineAttendance = (props) => {
     const programs = [
         "BCT",
         "BEI",
@@ -19,15 +19,18 @@ const ClassDetails = (props) => {
     ];
     const [isBatchValid, setIsBatchValid] = useState(true);
     const [isSubjectValid, setIsSubjectValid] = useState(true);
-    const sections = ["A", "B", "C", "D", "E", "F", "G", "H"];
+    const [isFileValid, setIsFileValid] = useState(true);
+    const [sections, setSections] = useState(["AB", "CD", "EF", "GH"]);
     const years = ["1", "2", "3", "4", "5"];
-    const [subject, setSubject] = useState("");
-    const [subjectOptions, setSubjectOptions] = useState([]);
     const [batch, setBatch] = useState("");
     const [program, setProgram] = useState("BCT");
-    const [section, setSection] = useState("A");
+    const [section, setSection] = useState("AB");
     const [year, setYear] = useState("1");
     const [part, setPart] = useState("1");
+    const [subject, setSubject] = useState("");
+    const [classType, setClassType] = useState("L");
+    const [subjectOptions, setSubjectOptions] = useState([]);
+    const [attendanceFile, setAttendanceFile] = useState("");
     const [programOptions, setProgramOptions] = useState(
         programs.map((eachProgram) => (
             <option key={eachProgram} value={eachProgram}>
@@ -35,13 +38,7 @@ const ClassDetails = (props) => {
             </option>
         ))
     );
-    const [sectionOptions, setSectionOptions] = useState(
-        sections.map((eachSection) => (
-            <option key={eachSection} value={eachSection}>
-                {eachSection}
-            </option>
-        ))
-    );
+    const [sectionOptions, setSectionOptions] = useState([]);
     const [yearOptions, setYearOptions] = useState(
         years.map((eachYear) => (
             <option key={eachYear} value={eachYear}>
@@ -51,6 +48,13 @@ const ClassDetails = (props) => {
     );
 
     useEffect(() => {
+        setSectionOptions(
+            sections.map((eachSection) => (
+                <option key={eachSection} value={eachSection}>
+                    {eachSection}
+                </option>
+            ))
+        );
         APICall.fetchSubjects(program, year, part)
             .then((subjects) => {
                 if (subjects === undefined || subjects.length === 0) {
@@ -192,7 +196,7 @@ const ClassDetails = (props) => {
             );
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [batch]);
+    }, [batch, sections]);
 
     useEffect(() => {
         if (program !== "BAR") {
@@ -248,12 +252,25 @@ const ClassDetails = (props) => {
             );
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [program]);
+    }, [program, sections]);
+
+    useEffect(() => {
+        classType === "L"
+            ? setSections(["AB", "CD", "EF", "GH"])
+            : setSections(["A", "B", "C", "D", "E", "F", "G", "H"]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [classType]);
+
+    useEffect(() => {
+        attendanceFile === "" ? setIsFileValid(false) : setIsFileValid(true);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [attendanceFile]);
 
     function handleSubmit(event) {
         event.preventDefault();
-        if (isSubjectValid) {
-            APICall.fetchStudents(program, batch, section).then(
+
+        if (isSubjectValid && isFileValid) {
+            APICall.fetchStudents(program, batch, section.charAt(0)).then(
                 (studentList) => {
                     if (studentList === undefined || studentList.length === 0) {
                         setIsBatchValid(false);
@@ -261,7 +278,7 @@ const ClassDetails = (props) => {
                         const studentDetails = {
                             batch: batch,
                             program: program,
-                            section: section,
+                            section: section.charAt(0),
                             students: JSON.stringify(studentList),
                         };
                         var studentFormBody = [];
@@ -283,6 +300,53 @@ const ClassDetails = (props) => {
                                 },
                             })
 
+                            .then(() => {
+                                if (section.length === 2) {
+                                    APICall.fetchStudents(
+                                        program,
+                                        batch,
+                                        section.charAt(1)
+                                    ).then((nextStudentList) => {
+                                        const nextStudentDetails = {
+                                            batch: batch,
+                                            program: program,
+                                            section: section.charAt(1),
+                                            students: JSON.stringify(
+                                                nextStudentList
+                                            ),
+                                        };
+                                        var nextStudentFormBody = [];
+                                        for (var property in nextStudentDetails) {
+                                            var encodedKey = encodeURIComponent(
+                                                property
+                                            );
+                                            var encodedValue = encodeURIComponent(
+                                                nextStudentDetails[property]
+                                            );
+                                            nextStudentFormBody.push(
+                                                encodedKey + "=" + encodedValue
+                                            );
+                                        }
+                                        nextStudentFormBody = nextStudentFormBody.join(
+                                            "&"
+                                        );
+                                        axios
+                                            .post(
+                                                "/backend/class/add-class",
+                                                nextStudentFormBody,
+                                                {
+                                                    headers: {
+                                                        "Content-Type":
+                                                            "application/x-www-form-urlencoded;charset=UTF-8",
+                                                    },
+                                                }
+                                            )
+                                            .catch((err) =>
+                                                alert("Error adding class")
+                                            );
+                                    });
+                                }
+                            })
                             .then(() => {
                                 const subjectDetails = {
                                     program: program,
@@ -321,40 +385,32 @@ const ClassDetails = (props) => {
                                             section: section,
                                             year: year,
                                             part: part,
-                                            subject: subject,
+                                            subject_code: JSON.parse(
+                                                subject
+                                            )[0],
+                                            classType: classType,
+                                            atten_file: attendanceFile,
                                         };
-                                        var formBody = [];
-                                        for (var property in details) {
-                                            var encodedKey = encodeURIComponent(
-                                                property
-                                            );
-                                            var encodedValue = encodeURIComponent(
-                                                details[property]
-                                            );
-                                            formBody.push(
-                                                encodedKey + "=" + encodedValue
-                                            );
-                                        }
-                                        formBody = formBody.join("&");
+                                        var formData = new FormData();
+                                        Object.keys(details).map((eachKey) =>
+                                            formData.append(
+                                                eachKey,
+                                                details[eachKey]
+                                            )
+                                        );
                                         axios
                                             .post(
-                                                "/backend/attendance/take",
-                                                formBody,
+                                                "/backend/attendance/takeOnlineNext",
+                                                formData,
                                                 {
                                                     headers: {
                                                         "Content-Type":
-                                                            "application/x-www-form-urlencoded;charset=UTF-8",
+                                                            "multipart/form-data",
                                                     },
                                                 }
                                             )
-                                            .then((response) => {
-                                                props.history.push({
-                                                    pathname:
-                                                        "/new/student/namelist",
-                                                    state: {
-                                                        data: response.data,
-                                                    },
-                                                });
+                                            .then(() => {
+                                                props.history.push("/");
                                             })
                                             .catch((err) =>
                                                 alert(
@@ -383,7 +439,7 @@ const ClassDetails = (props) => {
             <br />
 
             <form onSubmit={handleSubmit}>
-                <p className="h4 text-center py-4">Class Details</p>
+                <p className="h4 text-center py-4">Online Class Details</p>
                 <MDBRow>
                     <MDBCol md="4" className="mb-3">
                         <label
@@ -507,10 +563,55 @@ const ClassDetails = (props) => {
                         </div>
                     </MDBCol>
                 </MDBRow>
+                <MDBRow>
+                    <MDBCol md="4" className="mb-3">
+                        <label
+                            htmlFor="defaultFormCardNameEx"
+                            className="grey-text font-weight-light"
+                        >
+                            Class Type
+                        </label>
+                        <select
+                            id="ClassType"
+                            className="form-control"
+                            name="classType"
+                            value={classType}
+                            onChange={(event) =>
+                                setClassType(event.target.value)
+                            }
+                        >
+                            <option value="L">Lecture</option>
+                            <option value="P">Practical</option>
+                        </select>
+                    </MDBCol>
+                    <MDBCol md="4" className="mb-3">
+                        <label
+                            htmlFor="defaultFormCardNameEx"
+                            className="grey-text font-weight-light"
+                        >
+                            Upload attendance file
+                        </label>
+                        <input
+                            type="file"
+                            id="attendance"
+                            className="form-control-file"
+                            name="atten_file"
+                            onChange={(event) => {
+                                setAttendanceFile(event.target.files[0]);
+                            }}
+                        />
+                        <div className="invalid-feedback d-block">
+                            {!isFileValid ? "No file selected" : ""}
+                        </div>
+                    </MDBCol>
+                </MDBRow>
                 <div className="text-center py-4 mt-3">
                     <MDBBtn className="btn btn-outline-blue" type="submit">
-                        Take Attendance{" "}
-                        <i className="fas fa-clipboard-list"></i>
+                        Submit
+                        <i
+                            className="fas fa-clipboard-list"
+                            style={{ paddingLeft: 10, paddingRight: 10 }}
+                        ></i>
                     </MDBBtn>
                 </div>
             </form>
@@ -518,4 +619,4 @@ const ClassDetails = (props) => {
     );
 };
 
-export default withRouter(ClassDetails);
+export default withRouter(OnlineAttendance);

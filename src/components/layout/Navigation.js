@@ -60,15 +60,8 @@ class Navigation extends Component {
                             </MDBBtn>
                             <MDBBtn color="primary">
                                 <MDBNavItem>
-                                    <MDBNavLink to="/classes">
-                                        Select Class
-                                    </MDBNavLink>
-                                </MDBNavItem>
-                            </MDBBtn>
-                            <MDBBtn color="primary">
-                                <MDBNavItem>
-                                    <MDBNavLink to="/instructor">
-                                        Instructor
+                                    <MDBNavLink to="/online-attendance">
+                                        Online Class
                                     </MDBNavLink>
                                 </MDBNavItem>
                             </MDBBtn>

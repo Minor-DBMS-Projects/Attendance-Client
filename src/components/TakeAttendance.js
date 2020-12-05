@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { MDBTable, MDBTableBody, MDBTableHead, MDBBtn } from "mdbreact";
 import "../App.css";
-import { withRouter, Redirect, Link } from "react-router-dom";
+import { withRouter } from "react-router-dom";
 import axios from "axios";
 
 function TakeAttendance(props) {
-    console.log(props.location.state.data);
+    // eslint-disable-next-line
     const [data, setData] = useState(props.location.state.data);
     const [selectedClass, setSelectedClass] = useState("L");
     const [selectedSubject, setSelectedSubject] = useState(
@@ -138,10 +138,10 @@ function TakeAttendance(props) {
                                         : "#ffcccb",
                                 }}
                             >
-                                <td style={{ "font-weight": "bold" }}>
+                                <td style={{ fontWeight: "bold" }}>
                                     {student.roll_no}
                                 </td>
-                                <td style={{ "font-weight": "bold" }}>
+                                <td style={{ fontWeight: "bold" }}>
                                     {student.name}
                                 </td>
                                 <td>

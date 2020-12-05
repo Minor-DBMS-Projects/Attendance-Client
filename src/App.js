@@ -11,10 +11,10 @@ import ReactLoading from "react-loading";
 import Header from "./components/layout/Header";
 import Login from "./components/Login";
 import Dashboard from "./components/Dashboard";
-import Select_Class from "./components/Select_Class";
 import AttendanceHistory from "./components/AttendanceHistory";
 import TakeAttendance from "./components/TakeAttendance";
 import ClassDetails from "./components/ClassDetails";
+import OnlineAttendance from "./components/OnlineAttendance";
 
 function App(props) {
     let history = useHistory();
@@ -94,9 +94,14 @@ function App(props) {
                     <Route exact path="/class-details">
                         {authenticated ? <ClassDetails /> : <Redirect to="/" />}
                     </Route>
-                    <Route exact path="/classes">
-                        {authenticated ? <Select_Class /> : <Redirect to="/" />}
+                    <Route exact path="/online-attendance">
+                        {authenticated ? (
+                            <OnlineAttendance />
+                        ) : (
+                            <Redirect to="/" />
+                        )}
                     </Route>
+
                     <Route
                         exact
                         path="/new/student/namelist"

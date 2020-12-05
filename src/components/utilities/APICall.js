@@ -28,7 +28,6 @@ function fetchSubjects(program, year, part) {
             });
 
             res.on("error", function (error) {
-                console.log(error);
                 reject(error);
             });
         });

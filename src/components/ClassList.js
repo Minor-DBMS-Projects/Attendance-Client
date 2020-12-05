@@ -5,8 +5,6 @@ import { withRouter, Redirect, Link } from "react-router-dom";
 import axios from "axios";
 
 const ClassList = (props) => {
-    //const [takingAttendance,settakingAttendance]=useState(false)
-    //const [postData,setpostData]=useState({})
     const viewAttendance = () => {
         // return (
         //   <Redirect
@@ -49,28 +47,10 @@ const ClassList = (props) => {
                         data: response.data,
                     },
                 });
-                //settakingAttendance(true)
-                //setpostData(response.data)
             })
             .catch((errorMsg) => console.log(errorMsg.response));
     };
-    // if(takingAttendance){
-    //   settakingAttendance(false)
-    //
-    //   return(
-    //     props.history.push({
-    //       pathname:'/new/student/namelist',
-    //       state:{data:postData}
-    //     })
-    //     <Redirect
-    //           to={{
-    //           pathname: "/new/student/namelist",
-    //           state: { data: postData }
-    //         }}
-    //       />
-    //
-    //   )
-    // }
+
     return (
         <div className="child">
             <MDBListGroupItem hover>
