@@ -12,7 +12,7 @@ import {
 } from "mdbreact";
 import ReactHTMLTableToExcel from "react-html-table-to-excel";
 import DeleteButton from "./DeleteButton";
-
+import FadeIn from "react-fade-in";
 //var trecords = {};undefined
 
 const AttendanceHistory = (props) => {
@@ -179,153 +179,155 @@ const AttendanceHistory = (props) => {
     return count;
   };
   return (
-    <div>
-      <br />
+    <FadeIn>
+      <div>
+        <br />
 
-      <p>
-        <strong>Subject: </strong>
-        {details.subjectName}({details.type == "L" ? "Lecture" : "Practical"})
-      </p>
-      <p>
-        <strong>Batch: </strong>
-        {details.batch}
-        {details.program}
-        (Section {details.section})
-      </p>
+        <p>
+          <strong>Subject: </strong>
+          {details.subjectName}({details.type == "L" ? "Lecture" : "Practical"})
+        </p>
+        <p>
+          <strong>Batch: </strong>
+          {details.batch}
+          {details.program}
+          (Section {details.section})
+        </p>
 
-      <ReactHTMLTableToExcel
-        id="test-table-xls-button"
-        className="btn btn-success"
-        table="attendance_table"
-        filename={`${details.subjectName}_${details.batch}${details.program}${details.section}_${details.type}`}
-        sheet="tablexls"
-        buttonText="Export to Excel"
-      />
+        <ReactHTMLTableToExcel
+          id="test-table-xls-button"
+          className="btn btn-success"
+          table="attendance_table"
+          filename={`${details.subjectName}_${details.batch}${details.program}${details.section}_${details.type}`}
+          sheet="tablexls"
+          buttonText="Export to Excel"
+        />
 
-      <MDBBtn
-        color="primary"
-        style={{ width: "fit-content" }}
-        onClick={() => {
-          setBeginEdit(!beginEdit);
-        }}
-      >
-        Edit
-      </MDBBtn>
-      {!beginEdit ? (
         <MDBBtn
-          color="danger"
+          color="primary"
           style={{ width: "fit-content" }}
-          onClick={() => setBeginDelete(!beginDelete)}
+          onClick={() => {
+            setBeginEdit(!beginEdit);
+          }}
         >
-          Delete
+          Edit
         </MDBBtn>
-      ) : null}
-      <MDBTable bordered hover responsive id="attendance_table">
-        <MDBTableHead color="primary-color" textWhite>
-          <tr>
-            <th>Roll No</th>
-            <th>Name</th>
-            {Object.keys(records).map((i) =>
-              beginEdit ? (
-                <th key={i}>
-                  {" "}
-                  <MDBBtn
-                    style={{ width: "fit-content" }}
-                    color="primary"
-                    onClick={() => changeEditable(i)}
-                  >
-                    {new Date(records[i].date).toDateString()}{" "}
-                  </MDBBtn>{" "}
-                  {records[i].editable ? (
+        {!beginEdit ? (
+          <MDBBtn
+            color="danger"
+            style={{ width: "fit-content" }}
+            onClick={() => setBeginDelete(!beginDelete)}
+          >
+            Delete
+          </MDBBtn>
+        ) : null}
+        <MDBTable bordered hover responsive id="attendance_table">
+          <MDBTableHead color="primary-color" textWhite>
+            <tr>
+              <th>Roll No</th>
+              <th>Name</th>
+              {Object.keys(records).map((i) =>
+                beginEdit ? (
+                  <th key={i}>
+                    {" "}
                     <MDBBtn
-                      style={{
-                        width: "fit-content",
-                        color: "white",
-                      }}
-                      onClick={() => updateRecords(i)}
+                      style={{ width: "fit-content" }}
+                      color="primary"
+                      onClick={() => changeEditable(i)}
                     >
-                      Save
-                    </MDBBtn>
-                  ) : null}
-                </th>
-              ) : (
-                <th>
-                  {new Date(records[i].date).toDateString()}{" "}
-                  {beginDelete ? (
-                    <DeleteButton id={i} deleteRecord={deleteRecord} />
-                  ) : null}{" "}
-                </th>
-              )
-            )}
+                      {new Date(records[i].date).toDateString()}{" "}
+                    </MDBBtn>{" "}
+                    {records[i].editable ? (
+                      <MDBBtn
+                        style={{
+                          width: "fit-content",
+                          color: "white",
+                        }}
+                        onClick={() => updateRecords(i)}
+                      >
+                        Save
+                      </MDBBtn>
+                    ) : null}
+                  </th>
+                ) : (
+                  <th>
+                    {new Date(records[i].date).toDateString()}{" "}
+                    {beginDelete ? (
+                      <DeleteButton id={i} deleteRecord={deleteRecord} />
+                    ) : null}{" "}
+                  </th>
+                )
+              )}
 
-            {Object.keys(records).length > 0 ? <th>Total Present</th> : null}
-          </tr>
-        </MDBTableHead>
-        <MDBTableBody>
-          {students.map((student, index) => (
-            <tr key={student.roll_no}>
-              <td>
-                <strong style={{ fontWeight: "bold" }}>
-                  {student.roll_no}
-                </strong>
-              </td>
-              <td>
-                <strong style={{ fontWeight: "bold" }}>{student.name}</strong>
-              </td>
-              {Object.keys(records).length > 0
-                ? Object.keys(records).map((i) => (
-                    <td>
-                      {records[i].editable ? (
-                        <input
-                          type="checkbox"
-                          defaultChecked={
-                            records[i].students.includes(student.roll_no)
-                              ? true
-                              : false
-                          }
-                          // value={
-                          //   records[i].students.includes(student.roll_no)
-                          //     ? "present"
-                          //     : "absent"
-                          // }
-                          id={`checkbox${i}_${student.roll_no}`}
-                          onChange={() => handleChange(i, student.roll_no)}
-                        />
-                      ) : records[i].students.includes(student.roll_no) ? (
-                        <strong
-                          style={{
-                            color: "green",
-                            fontWeight: "bold",
-                          }}
-                        >
-                          {" "}
-                          P
-                        </strong>
-                      ) : (
-                        <strong
-                          style={{
-                            color: "red",
-                            fontWeight: "bold",
-                          }}
-                        >
-                          A
-                        </strong>
-                      )}
-                    </td>
-                  ))
-                : null}
-              {Object.keys(records).length > 0 ? (
+              {Object.keys(records).length > 0 ? <th>Total Present</th> : null}
+            </tr>
+          </MDBTableHead>
+          <MDBTableBody>
+            {students.map((student, index) => (
+              <tr key={student.roll_no}>
                 <td>
                   <strong style={{ fontWeight: "bold" }}>
-                    {counts[student.roll_no] ? counts[student.roll_no] : 0}
+                    {student.roll_no}
                   </strong>
                 </td>
-              ) : null}
-            </tr>
-          ))}
-        </MDBTableBody>
-      </MDBTable>
-    </div>
+                <td>
+                  <strong style={{ fontWeight: "bold" }}>{student.name}</strong>
+                </td>
+                {Object.keys(records).length > 0
+                  ? Object.keys(records).map((i) => (
+                      <td>
+                        {records[i].editable ? (
+                          <input
+                            type="checkbox"
+                            defaultChecked={
+                              records[i].students.includes(student.roll_no)
+                                ? true
+                                : false
+                            }
+                            // value={
+                            //   records[i].students.includes(student.roll_no)
+                            //     ? "present"
+                            //     : "absent"
+                            // }
+                            id={`checkbox${i}_${student.roll_no}`}
+                            onChange={() => handleChange(i, student.roll_no)}
+                          />
+                        ) : records[i].students.includes(student.roll_no) ? (
+                          <strong
+                            style={{
+                              color: "green",
+                              fontWeight: "bold",
+                            }}
+                          >
+                            {" "}
+                            P
+                          </strong>
+                        ) : (
+                          <strong
+                            style={{
+                              color: "red",
+                              fontWeight: "bold",
+                            }}
+                          >
+                            A
+                          </strong>
+                        )}
+                      </td>
+                    ))
+                  : null}
+                {Object.keys(records).length > 0 ? (
+                  <td>
+                    <strong style={{ fontWeight: "bold" }}>
+                      {counts[student.roll_no] ? counts[student.roll_no] : 0}
+                    </strong>
+                  </td>
+                ) : null}
+              </tr>
+            ))}
+          </MDBTableBody>
+        </MDBTable>
+      </div>
+    </FadeIn>
   );
 };
 

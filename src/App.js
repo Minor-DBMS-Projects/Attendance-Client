@@ -8,6 +8,7 @@ import {
   Redirect,
 } from "react-router-dom";
 import ReactLoading from "react-loading";
+import FadeIn from "react-fade-in";
 import Header from "./components/layout/Header";
 import Login from "./components/Login";
 import Dashboard from "./components/Dashboard";
@@ -83,14 +84,22 @@ function App(props) {
             {authenticated ? (
               <Redirect to="/dashboard" />
             ) : (
-              <Login
-                authenticated={authenticated}
-                setAuthenticated={setAuthenticated}
-              />
+              <FadeIn>
+                <Login
+                  authenticated={authenticated}
+                  setAuthenticated={setAuthenticated}
+                />{" "}
+              </FadeIn>
             )}
           </Route>
           <Route exact path="/dashboard">
-            {authenticated ? <Dashboard /> : <Redirect to="/" />}
+            {authenticated ? (
+              <FadeIn>
+                <Dashboard />{" "}
+              </FadeIn>
+            ) : (
+              <Redirect to="/" />
+            )}
           </Route>
           <Route exact path="/class-details">
             {authenticated ? <ClassDetails /> : <Redirect to="/" />}
@@ -117,10 +126,6 @@ function App(props) {
             ) : (
               <Redirect to="/" />
             )}
-          </Route>
-
-          <Route exact path="/success">
-            <h1>Logged in successfully</h1>
           </Route>
         </Switch>
       </div>
