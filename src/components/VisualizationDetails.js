@@ -5,7 +5,7 @@ import axios from "axios";
 import { withRouter } from "react-router-dom";
 import FadeIn from "react-fade-in";
 
-const ClassDetails = (props) => {
+const VisualizationDetails = (props) => {
     const [isClassValid, setIsClassValid] = useState(true);
     const [isSubjectValid, setIsSubjectValid] = useState(true);
     const [subject, setSubject] = useState("");
@@ -14,6 +14,7 @@ const ClassDetails = (props) => {
     const [section, setSection] = useState("");
     const [year, setYear] = useState("");
     const [part, setPart] = useState("");
+    const [classType, setClassType] = useState("L");
     const [programOptions, setProgramOptions] = useState([]);
     const [batchOptions, setBatchOptions] = useState([]);
     const [sectionOptions, setSectionOptions] = useState([]);
@@ -285,12 +286,8 @@ const ClassDetails = (props) => {
         event.preventDefault();
         if (isClassValid && isSubjectValid) {
             const details = {
-                batch: batch,
                 program: program,
-                section: section,
-                year: year,
-                part: part,
-                subject: subject,
+                batch: batch,
             };
             var formBody = [];
             for (var property in details) {
@@ -300,23 +297,22 @@ const ClassDetails = (props) => {
             }
             formBody = formBody.join("&");
             axios
-                .post("/backend/attendance/take", formBody, {
+                .post("/backend/class/getClass", formBody, {
                     headers: {
                         "Content-Type":
                             "application/x-www-form-urlencoded;charset=UTF-8",
                     },
                 })
                 .then((response) => {
-                    props.history.push({
-                        pathname: "/new/student/namelist",
-                        state: {
-                            data: response.data,
-                        },
-                    });
+                    const classId = response.data.classes.filter(
+                        (eachClass) => eachClass.class_group === section
+                    )[0].id;
+                    const subjectCode = JSON.parse(subject)[0];
+                    props.history.push(
+                        `/visualization/${classId}/${subjectCode}/${classType}`
+                    );
                 })
-                .catch((err) =>
-                    alert("Unexpected error while fetching attendance")
-                );
+                .catch((err) => alert("Failed to submit"));
         }
     }
 
@@ -327,7 +323,9 @@ const ClassDetails = (props) => {
                 <br />
 
                 <form onSubmit={handleSubmit}>
-                    <p className="h4 text-center py-4">Class Details</p>
+                    <p className="h4 text-center py-4">
+                        Class Details for Visualization
+                    </p>
                     <MDBRow>
                         <MDBCol md="4" className="mb-3">
                             <label
@@ -463,10 +461,31 @@ const ClassDetails = (props) => {
                             </select>
                         </MDBCol>
                     </MDBRow>
+                    <MDBRow>
+                        <MDBCol md="4" className="mb-3">
+                            <label
+                                htmlFor="defaultFormCardNameEx"
+                                className="grey-text font-weight-light"
+                            >
+                                Class Type
+                            </label>
+                            <select
+                                id="ClassType"
+                                className="form-control"
+                                name="classType"
+                                value={classType}
+                                onChange={(event) =>
+                                    setClassType(event.target.value)
+                                }
+                            >
+                                <option value="L">Lecture</option>
+                                <option value="P">Practical</option>
+                            </select>
+                        </MDBCol>
+                    </MDBRow>
                     <div className="text-center py-4 mt-3">
                         <MDBBtn className="btn btn-outline-blue" type="submit">
-                            Take Attendance{" "}
-                            <i className="fas fa-clipboard-list"></i>
+                            Visualize <i class="fas fa-chart-area"></i>
                         </MDBBtn>
                     </div>
                 </form>
@@ -475,4 +494,4 @@ const ClassDetails = (props) => {
     );
 };
 
-export default withRouter(ClassDetails);
+export default withRouter(VisualizationDetails);

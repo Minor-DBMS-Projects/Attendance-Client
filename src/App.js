@@ -17,6 +17,7 @@ import TakeAttendance from "./components/TakeAttendance";
 import ClassDetails from "./components/ClassDetails";
 import OnlineAttendance from "./components/OnlineAttendance";
 import Visualization from "./components/Visualization";
+import VisualizationDetails from "./components/VisualizationDetails";
 import "./App.css";
 
 function App(props) {
@@ -104,6 +105,13 @@ function App(props) {
                     </Route>
                     <Route exact path="/class-details">
                         {authenticated ? <ClassDetails /> : <Redirect to="/" />}
+                    </Route>
+                    <Route exact path="/visualization-details">
+                        {authenticated ? (
+                            <VisualizationDetails />
+                        ) : (
+                            <Redirect to="/" />
+                        )}
                     </Route>
                     <Route exact path="/online-attendance">
                         {authenticated ? (

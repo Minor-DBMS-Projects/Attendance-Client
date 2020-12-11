@@ -50,7 +50,7 @@ const ClassList = (props) => {
             })
             .catch((errorMsg) => console.log(errorMsg.response));
     };
-    ///all/:classId/:subjectCode/:classType
+
     return (
         <div className="child">
             <MDBListGroupItem hover>
@@ -88,13 +88,6 @@ const ClassList = (props) => {
                     >
                         Take Attendance
                     </MDBBtn>
-                    <Link
-                        to={`/visualization/${props.attendance.class}/${props.attendance.subjectCode}/${props.attendance.classType}`}
-                    >
-                        <MDBBtn color="primary" style={{ color: "white" }}>
-                            Visualization
-                        </MDBBtn>
-                    </Link>
                 </form>
             </MDBListGroupItem>
         </div>

@@ -1,30 +1,25 @@
-import React, { useEffect, useState } from "react";
-import { withRouter, useParams } from "react-router-dom";
-import * as d3 from "d3";
+import React, { Component } from "react";
+import { HorizontalBar, Line } from "react-chartjs-2";
+import { MDBContainer, MDBTableBody, MDBTable, MDBTableHead } from "mdbreact";
+import { withRouter } from "react-router-dom";
 import axios from "axios";
-import FadeIn from "react-fade-in";
 
-const Visualization = (props) => {
-    const { classId, subjectCode, classType } = useParams();
-    const [details, setDetails] = useState({});
-    const [records, setRecords] = useState({});
-    const [students, setStudents] = useState([]);
-    const [presentCount, setPresentCount] = useState([]);
-    const [displayData, setDisplayData] = useState([]);
-    const [rendered, setRendered] = useState(false);
+class Visualization extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {};
+    }
 
-    useEffect(() => {
+    componentDidMount() {
         axios
             .get(
-                `/backend/attendance/all/${classId}/${subjectCode}/${classType}`
+                `/backend/attendance/allRecord/${this.props.match.params.classId}/${this.props.match.params.subjectCode}/${this.props.match.params.classType}`
             )
             .then((response) => {
                 console.log(response.data);
-                setDetails(response.data.details);
-                setRecords(response.data.records);
-                setStudents(response.data.students);
-                console.log(records, students, presentCount);
-                var count = [];
+                var studentWiseCount = [];
+                var dates = [];
+                var dateWiseCount = [];
                 response.data.students.forEach((student, index) => {
                     var c = 0;
                     Object.keys(response.data.records).forEach((i) => {
@@ -36,135 +31,241 @@ const Visualization = (props) => {
                             c += 1;
                         }
                     });
-                    count[index] = c;
+                    studentWiseCount[index] = c;
                 });
-                setPresentCount(count);
-                setDisplayData(
-                    response.data.students.map((eachStudent, index) => {
+
+                Object.keys(response.data.records).forEach((key) => {
+                    dates.push(response.data.records[key].date);
+                    dateWiseCount.push(
+                        response.data.records[key].students.length
+                    );
+                });
+
+                const studentData = response.data.students.map(
+                    (eachStudent, index) => {
                         return {
                             name: eachStudent.name,
-                            value: count[index],
+                            value: studentWiseCount[index],
                         };
-                    })
+                    }
                 );
-            })
-            .catch((err) => console.log(err));
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [classId, subjectCode, classType]);
+                studentData.sort((a, b) => b.value - a.value);
 
-    useEffect(() => {
-        if (!(displayData === undefined || displayData.length === 0)) {
-            if (!rendered) {
-                drawChart();
-                setRendered(true);
-            }
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [displayData]);
-
-    const drawChart = () => {
-        var data = displayData.map((eachData) => {
-            return { name: eachData.name, value: eachData.value };
-        });
-        data = data.sort((a, b) => {
-            return d3.ascending(a.value, b.value);
-        });
-        const margin = {
-            top: 15,
-            right: 25,
-            bottom: 15,
-            left: 150,
-        };
-
-        const width = 960 - margin.left - margin.right,
-            height = 500 - margin.top - margin.bottom;
-
-        var svg = d3
-            .select("#barChart")
-            .classed("container", true)
-            .append("svg")
-            .attr("id", "1")
-            .attr(
-                "viewBox",
-                `0 0 ${width + margin.left + margin.right} ${
-                    height + margin.top + margin.bottom
-                }`
-            )
-            .attr("preserveAspectRatio", "xMinYMin meet")
-            .append("g")
-            .attr(
-                "transform",
-                "translate(" + margin.left + "," + margin.top + ")"
-            );
-        var x = d3
-            .scaleLinear()
-            .range([0, width])
-            .domain([
-                0,
-                d3.max(data, (d) => {
-                    return d.value;
-                }),
-            ]);
-
-        var y = d3
-            .scaleBand()
-            .rangeRound([height, 0])
-            .padding(0.1)
-            .domain(
-                data.map((d) => {
-                    return d.name;
-                })
-            );
-
-        var yAxis = d3.axisLeft(y).tickSize(0);
-
-        svg.append("g").attr("class", "y axis").call(yAxis);
-
-        var bars = svg.selectAll(".bar").data(data).enter().append("g");
-
-        bars.append("rect")
-            .attr("class", "bar")
-            .attr("y", (d) => {
-                return y(d.name);
-            })
-            .attr("height", y.bandwidth())
-            .attr("x", 0)
-            .attr("fill", "#007bff")
-            .attr("width", (d) => {
-                return x(d.value);
+                this.setState({
+                    records: response.data.records,
+                    students: response.data.students,
+                    studentWiseCount: studentWiseCount,
+                    subject:
+                        response.data.details.subject +
+                        " " +
+                        response.data.details.subjectName,
+                    classTitle:
+                        response.data.details.batch +
+                        response.data.details.program,
+                    section: response.data.details.section,
+                    classType:
+                        response.data.details.type === "L"
+                            ? "Lecture"
+                            : "Practical",
+                    dataLine: {
+                        labels: dates,
+                        datasets: [
+                            {
+                                label: "",
+                                fill: true,
+                                lineTension: 0.3,
+                                backgroundColor: "rgba(184, 185, 210, .3)",
+                                borderColor: "rgb(35, 26, 136)",
+                                borderCapStyle: "butt",
+                                borderDash: [],
+                                borderDashOffset: 0.0,
+                                borderJoinStyle: "miter",
+                                pointBorderColor: "rgb(35, 26, 136)",
+                                pointBackgroundColor: "rgb(255, 255, 255)",
+                                pointBorderWidth: 10,
+                                pointHoverRadius: 5,
+                                pointHoverBackgroundColor: "rgb(0, 0, 0)",
+                                pointHoverBorderColor: "rgba(220, 220, 220, 1)",
+                                pointHoverBorderWidth: 2,
+                                pointRadius: 1,
+                                pointHitRadius: 10,
+                                data: dateWiseCount,
+                            },
+                        ],
+                    },
+                    dataHorizontal: {
+                        labels: studentData.map(
+                            (eachStudent) => eachStudent.name
+                        ),
+                        datasets: [
+                            {
+                                label: "",
+                                data: studentData.map(
+                                    (eachStudent) => eachStudent.value
+                                ),
+                                fill: false,
+                                backgroundColor: studentData.map(() => {
+                                    return "rgba(0, 123, 255, 0.6)";
+                                }),
+                                borderColor: studentData.map(() => {
+                                    return "rgba(0,123,255,1)";
+                                }),
+                                borderWidth: 2,
+                            },
+                        ],
+                    },
+                });
             });
+    }
 
-        bars.append("text")
-            .attr("class", "label")
-
-            .attr("y", (d) => {
-                return y(d.name) + y.bandwidth() / 2 + 4;
-            })
-
-            .attr("x", (d) => {
-                return x(d.value) + 3;
-            })
-            .text((d) => {
-                return d.value;
-            });
+    barChartOptions = {
+        responsive: true,
+        legend: false,
+        scales: {
+            xAxes: [
+                {
+                    ticks: {
+                        beginAtZero: true,
+                    },
+                },
+            ],
+        },
     };
 
-    return (
-        <FadeIn>
-            <br />
-            <br />
+    lineChartOptions = {
+        responsive: true,
+        legend: false,
+    };
 
-            <div className="card">
-                <div className="card-body">
-                    <h5 className="card-title text-center">
-                        {details.subjectName}
-                    </h5>
-
-                    <div id="barChart"></div>
+    render() {
+        return (
+            <MDBContainer>
+                <h3 className="mt-5 text-center">{this.state.subject}</h3>
+                <p className="text-center">
+                    Class: {this.state.classTitle}, Section:{" "}
+                    {this.state.section}, Type: {this.state.classType}
+                </p>
+                <div className="card">
+                    <div className="card-body">
+                        <div className="card-title text-center">
+                            Date-wise Attendance Record
+                        </div>
+                        <Line
+                            data={this.state.dataLine}
+                            options={this.lineChartOptions}
+                        />
+                    </div>
                 </div>
-            </div>
-        </FadeIn>
-    );
-};
+
+                <br />
+                <br />
+                <div className="card">
+                    <div className="card-body">
+                        <div className="card-title text-center">
+                            Student-wise Attendance Record
+                        </div>
+                        <HorizontalBar
+                            data={this.state.dataHorizontal}
+                            options={this.barChartOptions}
+                        />
+                    </div>
+                </div>
+                <br />
+                <br />
+                <p className="text-center" style={{ fontWeight: "bold" }}>
+                    Attendance Table
+                </p>
+                {this.state.records === undefined ||
+                this.state.students === undefined ? null : (
+                    <MDBTable bordered hover responsive id="attendance_table">
+                        <MDBTableHead color="primary-color" textWhite>
+                            <tr>
+                                <th>Roll No</th>
+                                <th>Name</th>
+                                {Object.keys(this.state.records).map((key) => {
+                                    return (
+                                        <th key={key}>
+                                            {this.state.records[key].date}
+                                        </th>
+                                    );
+                                })}
+                                {Object.keys(this.state.records).length > 0 ? (
+                                    <th>Total Present</th>
+                                ) : null}
+                            </tr>
+                        </MDBTableHead>
+                        <MDBTableBody>
+                            {this.state.students.map((eachStudent, index) => {
+                                return (
+                                    <tr>
+                                        <td style={{ fontWeight: "bold" }}>
+                                            {eachStudent.roll_no}
+                                        </td>
+                                        <td style={{ fontWeight: "bold" }}>
+                                            {eachStudent.name}
+                                        </td>
+                                        {Object.keys(this.state.records)
+                                            .length > 0
+                                            ? Object.keys(
+                                                  this.state.records
+                                              ).map((i) => (
+                                                  <td>
+                                                      {this.state.records[
+                                                          i
+                                                      ].students.includes(
+                                                          eachStudent.roll_no
+                                                      ) ? (
+                                                          <strong
+                                                              style={{
+                                                                  color:
+                                                                      "green",
+                                                                  fontWeight:
+                                                                      "bold",
+                                                              }}
+                                                          >
+                                                              {" "}
+                                                              P
+                                                          </strong>
+                                                      ) : (
+                                                          <strong
+                                                              style={{
+                                                                  color: "red",
+                                                                  fontWeight:
+                                                                      "bold",
+                                                              }}
+                                                          >
+                                                              A
+                                                          </strong>
+                                                      )}
+                                                  </td>
+                                              ))
+                                            : null}
+                                        {Object.keys(this.state.records)
+                                            .length > 0 ? (
+                                            <td>
+                                                <strong
+                                                    style={{
+                                                        fontWeight: "bold",
+                                                    }}
+                                                >
+                                                    {
+                                                        this.state
+                                                            .studentWiseCount[
+                                                            index
+                                                        ]
+                                                    }
+                                                </strong>
+                                            </td>
+                                        ) : null}
+                                    </tr>
+                                );
+                            })}
+                        </MDBTableBody>
+                    </MDBTable>
+                )}
+            </MDBContainer>
+        );
+    }
+}
 
 export default withRouter(Visualization);
