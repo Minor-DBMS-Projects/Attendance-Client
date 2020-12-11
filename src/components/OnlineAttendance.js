@@ -170,7 +170,9 @@ const OnlineAttendance = (props) => {
                         if (i !== class_groups_temp.length - 1) {
                             if (
                                 ch.charCodeAt(0) ===
-                                class_groups_temp[i + 1].charCodeAt(0) - 1
+                                    class_groups_temp[i + 1].charCodeAt(0) -
+                                        1 &&
+                                ch.charCodeAt(0) % 2 === 1
                             ) {
                                 class_groups.push(
                                     ch + class_groups_temp[i + 1]

@@ -49,7 +49,11 @@ class Visualization extends Component {
                         };
                     }
                 );
-                studentData.sort((a, b) => b.value - a.value);
+                studentData
+                    .sort((a, b) => b.value - a.value)
+                    .sort((a, b) =>
+                        a.value === b.value ? a.name - b.name : 1
+                    );
 
                 this.setState({
                     records: response.data.records,
@@ -105,12 +109,12 @@ class Visualization extends Component {
                                 ),
                                 fill: false,
                                 backgroundColor: studentData.map(() => {
-                                    return "rgba(0, 123, 255, 0.6)";
+                                    return "rgba(16, 34, 196, 0.6)";
                                 }),
                                 borderColor: studentData.map(() => {
-                                    return "rgba(0,123,255,1)";
+                                    return "rgba(16, 34, 196,1)";
                                 }),
-                                borderWidth: 2,
+                                borderWidth: 3,
                             },
                         ],
                     },
@@ -129,12 +133,28 @@ class Visualization extends Component {
                     },
                 },
             ],
+            yAxes: [
+                {
+                    ticks: {
+                        fontStyle: "bold",
+                    },
+                },
+            ],
         },
     };
 
     lineChartOptions = {
         responsive: true,
         legend: false,
+        scales: {
+            yAxes: [
+                {
+                    ticks: {
+                        beginAtZero: true,
+                    },
+                },
+            ],
+        },
     };
 
     render() {
@@ -148,7 +168,7 @@ class Visualization extends Component {
                 <div className="card">
                     <div className="card-body">
                         <div className="card-title text-center">
-                            Date-wise Attendance Record
+                            Datewise Attendance Record
                         </div>
                         <Line
                             data={this.state.dataLine}
@@ -162,7 +182,7 @@ class Visualization extends Component {
                 <div className="card">
                     <div className="card-body">
                         <div className="card-title text-center">
-                            Student-wise Attendance Record
+                            Studentwise Attendance Record
                         </div>
                         <HorizontalBar
                             data={this.state.dataHorizontal}
