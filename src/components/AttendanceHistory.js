@@ -35,11 +35,7 @@ const AttendanceHistory = (props) => {
     axios
       .get(`/backend/attendance/all/${classId}/${subjectCode}/${classType}`, { headers: { "authorization": Cookies.get('attendnace-jwt-token') } })
       .then((res) => {
-        if (res.status == 401) {
-          this.props.setloading(true);
-          this.props.history.push("/");
-          this.props.setloading(false);
-        }
+        
         var recs = res.data.records;
         Object.keys(recs).map((i) => {
           recs[i].editable = false;
@@ -51,7 +47,14 @@ const AttendanceHistory = (props) => {
 
         //setCounts(res.data.counts);
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {console.log(err.status)
+      
+        if (err.status === 401) {
+          this.props.setloading(true);
+          this.props.history.push("/");
+          this.props.setloading(false);
+        }
+      });
   }, [classId, subjectCode, classType]);
   //console.log(props.match);
 
@@ -158,7 +161,7 @@ const AttendanceHistory = (props) => {
           return result;
         }, {})
     );
-   e.log(records);
+  
 
     axios
       .get(`/backend/attendance/delete/${i}`, { headers: { "authorization": Cookies.get('attendnace-jwt-token') } })
