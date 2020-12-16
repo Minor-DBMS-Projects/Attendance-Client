@@ -3,17 +3,18 @@ import { HorizontalBar, Line } from "react-chartjs-2";
 import { MDBContainer, MDBTableBody, MDBTable, MDBTableHead } from "mdbreact";
 import { withRouter } from "react-router-dom";
 import axios from "axios";
+import * as Cookies from 'js-cookie';
 
 class Visualization extends Component {
     constructor(props) {
         super(props);
         this.state = {};
     }
-
+    
     componentDidMount() {
         axios
             .get(
-                `/backend/attendance/allRecord/${this.props.match.params.classId}/${this.props.match.params.subjectCode}/${this.props.match.params.classType}`
+                `/backend/attendance/allRecord/${this.props.match.params.classId}/${this.props.match.params.subjectCode}/${this.props.match.params.classType}`, {headers: { "authorization": Cookies.get('attendnace-jwt-token') }}
             )
             .then((response) => {
                 console.log(response.data);

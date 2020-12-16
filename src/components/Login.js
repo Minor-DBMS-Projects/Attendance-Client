@@ -9,9 +9,10 @@ import {
   MDBBtn,
   MDBAlert,
 } from "mdbreact";
-import axios from "axios";
+import * as Cookies from 'js-cookie';
 
 const Login = (props) => {
+
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [invalid, setInvalid] = useState(false);
@@ -21,46 +22,28 @@ const Login = (props) => {
     const requestOptions = {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      //withCredentials: true,
       body: JSON.stringify({ code: username, password: password }),
     };
-    fetch("/backend/login", requestOptions)
+    fetch("/backend/authentication/login", requestOptions)
+    .then((response)=>{
+      if (response.status === 200) return response.json();
+      if (response.status === 401) return
+    })
       .then((res) => {
-        if (res.status == 200) {
-          console.log("Logged in");
+       
+        if (res.token)
+        {
+          Cookies.set('attendnace-jwt-token', res.token, { expires: 1/48, path: '' });
           props.setAuthenticated(true);
           props.history.push("/dashboard");
-        } else {
-          console.log("Failed to log in");
+        }
+        else{
           setInvalid(true);
         }
-        // else {
-        //   throw new Error("Not logged in");
-        // }
+        
       })
       .catch((err) => console.log(err));
-    // const login_axios = axios.create({
-    //   withCredentials: true,
-    //   headers: {
-    //     Accept: "application/json",
-    //     "Content-Type": "x-www-form-urlencoded",
-    //   },
-    //   params: {
-    //     code: username,
-    //     password: password,
-    //   },
-    // });
 
-    // login_axios
-    //   .post("/login")
-    //   .then(function (response) {
-    //     console.log("RESPONSE");
-    //     console.log(response);
-    //   })
-    //   .catch(function (error) {
-    //     console.log("ERROR");
-    //     console.log(error);
-    //   });
   };
   return (
     <MDBContainer className="mr-5 mt-5">

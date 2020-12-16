@@ -4,6 +4,7 @@ import "../App.css";
 import { withRouter } from "react-router-dom";
 import axios from "axios";
 import FadeIn from "react-fade-in";
+import * as Cookies from 'js-cookie';
 
 function TakeAttendance(props) {
     // eslint-disable-next-line
@@ -103,7 +104,9 @@ function TakeAttendance(props) {
                 headers: {
                     "Content-Type":
                         "application/x-www-form-urlencoded;charset=UTF-8",
+                         "authorization": Cookies.get('attendnace-jwt-token') 
                 },
+                
             })
             .then(() =>
                 props.history.push(

@@ -4,6 +4,7 @@ import "../App.css";
 import axios from "axios";
 import { withRouter } from "react-router-dom";
 import FadeIn from "react-fade-in";
+import * as Cookies from 'js-cookie';
 
 const ClassDetails = (props) => {
     const [isClassValid, setIsClassValid] = useState(true);
@@ -23,7 +24,7 @@ const ClassDetails = (props) => {
 
     useEffect(() => {
         axios
-            .get("/backend/program")
+            .get("/backend/program", {headers: { "authorization": Cookies.get('attendnace-jwt-token') }})
             .then((response) => {
                 setProgram(response.data[0].id);
                 setProgramOptions(
@@ -54,6 +55,7 @@ const ClassDetails = (props) => {
                 headers: {
                     "Content-Type":
                         "application/x-www-form-urlencoded;charset=UTF-8",
+                        "authorization": Cookies.get('attendnace-jwt-token')
                 },
             })
 
@@ -95,6 +97,7 @@ const ClassDetails = (props) => {
                 headers: {
                     "Content-Type":
                         "application/x-www-form-urlencoded;charset=UTF-8",
+                        "authorization": Cookies.get('attendnace-jwt-token')
                 },
             })
             .then((response) => {
@@ -152,6 +155,7 @@ const ClassDetails = (props) => {
                     headers: {
                         "Content-Type":
                             "application/x-www-form-urlencoded;charset=UTF-8",
+                            "authorization": Cookies.get('attendnace-jwt-token')
                     },
                 })
                 .then((response) => {
@@ -203,6 +207,7 @@ const ClassDetails = (props) => {
                     headers: {
                         "Content-Type":
                             "application/x-www-form-urlencoded;charset=UTF-8",
+                            "authorization": Cookies.get('attendnace-jwt-token')
                     },
                 })
                 .then((response) => {
@@ -251,6 +256,7 @@ const ClassDetails = (props) => {
                     headers: {
                         "Content-Type":
                             "application/x-www-form-urlencoded;charset=UTF-8",
+                             "authorization": Cookies.get('attendnace-jwt-token')
                     },
                 })
                 .then((response) => {
@@ -304,6 +310,7 @@ const ClassDetails = (props) => {
                     headers: {
                         "Content-Type":
                             "application/x-www-form-urlencoded;charset=UTF-8",
+                            "authorization": Cookies.get('attendnace-jwt-token')
                     },
                 })
                 .then((response) => {

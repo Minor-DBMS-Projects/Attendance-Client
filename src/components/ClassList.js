@@ -3,14 +3,10 @@ import { MDBListGroupItem, MDBBtn } from "mdbreact";
 import "../App.css";
 import { withRouter, Redirect, Link } from "react-router-dom";
 import axios from "axios";
+import * as Cookies from 'js-cookie';
 
 const ClassList = (props) => {
     const viewAttendance = () => {
-        // return (
-        //   <Redirect
-        //     to={`/history/${props.attendance.class}/${props.attendance.subjectCode}/${props.attendance.classType}`}
-        //   />
-        // );
         props.history.push(
             `/history/${props.attendance.class}/${props.attendance.subjectCode}/${props.attendance.classType}`
         );
@@ -38,6 +34,7 @@ const ClassList = (props) => {
                 headers: {
                     "Content-Type":
                         "application/x-www-form-urlencoded;charset=UTF-8",
+                        "authorization": Cookies.get('attendnace-jwt-token')
                 },
             })
             .then((response) => {

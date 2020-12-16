@@ -19,6 +19,7 @@ import OnlineAttendance from "./components/OnlineAttendance";
 import Visualization from "./components/Visualization";
 import VisualizationDetails from "./components/VisualizationDetails";
 import "./App.css";
+import * as Cookies from 'js-cookie';
 
 function App(props) {
     let history = useHistory();
@@ -32,21 +33,15 @@ function App(props) {
     };
 
     useEffect(() => {
+     
+        console.log(Cookies.get('attendnace-jwt-token'))
         fetch(
-            "/authentication"
-            // , {
-            //   method: "GET",
-            //   credentials: "include",
-            //   headers: {
-            //     Accept: "application/json",
-            //     "Content-Type": "application/json",
-            //     "Access-Control-Allow-Credentials": true,
-            //   },
-            // }
+            "backend/authentication/authenticate", {headers: { "authorization": Cookies.get('attendnace-jwt-token') }}
         )
             .then((response) => {
+              
                 if (response.status === 200) return response.json();
-                //throw new Error("failed to authenticate user");
+                
             })
             .then((responseJson) => {
                 if (responseJson.authenticated) {

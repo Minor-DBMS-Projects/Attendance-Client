@@ -11,6 +11,7 @@ import {
 } from "mdbreact";
 import { withRouter } from "react-router-dom";
 import axios from "axios";
+import * as Cookies from 'js-cookie';
 
 class Navigation extends Component {
     state = {
@@ -22,16 +23,14 @@ class Navigation extends Component {
     };
 
     logout = () => {
+        this.props.setAuthenticated(false);
+        Cookies.remove('attendnace-jwt-token', { path: '' });
         this.props.setloading(true);
-        axios
-            .get("/backend/logout")
-            .then(() => {
-                this.props.setAuthenticated(!this.props.authenticated);
-                this.props.history.push("/");
-                this.props.setloading(false);
-            })
-            .catch((err) => console.log(err));
-    };
+        this.props.history.push("/");
+        this.props.setloading(false);
+          
+      };
+    
 
     render() {
         if (!this.props.authenticated) {

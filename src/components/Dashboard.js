@@ -4,23 +4,19 @@ import axios from "axios";
 import { MDBContainer, MDBListGroup } from "mdbreact";
 import "../App.css";
 import ClassList from "./ClassList";
+import * as Cookies from 'js-cookie';
 
 const Dashboard = () => {
     const [attendanceData, setattendanceData] = useState([]);
     useEffect(() => {
         axios
-            .get("/backend/attendance/getRecent/30")
+            .get("/backend/attendance/getRecent/30", {headers: { "authorization": Cookies.get('attendnace-jwt-token') }})
             .then((res) => {
                 console.log(res.data);
                 setattendanceData(res.data);
             })
             .catch((err) => console.log(err));
-        // fetch("/attendance/getRecent/30")
-        //   .then((response) => response.json())
-        //   .then((data) => {
-        //     console.log(data);
-        //     setattendanceData(data);
-        //   });
+     
         return () => console.log("unmounting...");
     }, [setattendanceData]);
     return (

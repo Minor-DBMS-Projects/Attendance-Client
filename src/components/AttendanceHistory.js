@@ -13,7 +13,7 @@ import {
 import ReactHTMLTableToExcel from "react-html-table-to-excel";
 import DeleteButton from "./DeleteButton";
 import FadeIn from "react-fade-in";
-//var trecords = {};undefined
+import * as Cookies from 'js-cookie';
 
 const AttendanceHistory = (props) => {
   const [counts, setCounts] = useState({});
@@ -33,7 +33,7 @@ const AttendanceHistory = (props) => {
 
   useEffect(() => {
     axios
-      .get(`/backend/attendance/all/${classId}/${subjectCode}/${classType}`)
+      .get(`/backend/attendance/all/${classId}/${subjectCode}/${classType}`, {headers: { "authorization": Cookies.get('attendnace-jwt-token') }})
       .then((res) => {
         //console.log(res);
         console.log(res.data);
@@ -132,7 +132,7 @@ const AttendanceHistory = (props) => {
 
     const requestOptions = {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json",  "authorization": Cookies.get('attendnace-jwt-token') },
       //withCredentials: true,
       body: JSON.stringify({ students: records[i].students.sort() }),
     };
@@ -159,7 +159,7 @@ const AttendanceHistory = (props) => {
     // console.log(records);
 
     axios
-      .get(`/backend/attendance/delete/${i}`)
+      .get(`/backend/attendance/delete/${i}`, {headers: { "authorization": Cookies.get('attendnace-jwt-token') }})
       .then((res) => console.log(res))
       .catch((err) => console.log(err));
   };
