@@ -12,7 +12,12 @@ const Dashboard = () => {
         axios
             .get("/backend/attendance/getRecent/30", {headers: { "authorization": Cookies.get('attendnace-jwt-token') }})
             .then((res) => {
-                console.log(res.data);
+                console.log(res)
+                if (res.status ===401) {
+                    this.props.setloading(true);
+                    this.props.history.push("/");
+                    this.props.setloading(false);
+                  }
                 setattendanceData(res.data);
             })
             .catch((err) => console.log(err));

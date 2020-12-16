@@ -33,10 +33,13 @@ const AttendanceHistory = (props) => {
 
   useEffect(() => {
     axios
-      .get(`/backend/attendance/all/${classId}/${subjectCode}/${classType}`, {headers: { "authorization": Cookies.get('attendnace-jwt-token') }})
+      .get(`/backend/attendance/all/${classId}/${subjectCode}/${classType}`, { headers: { "authorization": Cookies.get('attendnace-jwt-token') } })
       .then((res) => {
-        //console.log(res);
-        console.log(res.data);
+        if (res.status == 401) {
+          this.props.setloading(true);
+          this.props.history.push("/");
+          this.props.setloading(false);
+        }
         var recs = res.data.records;
         Object.keys(recs).map((i) => {
           recs[i].editable = false;
@@ -132,13 +135,17 @@ const AttendanceHistory = (props) => {
 
     const requestOptions = {
       method: "POST",
-      headers: { "Content-Type": "application/json",  "authorization": Cookies.get('attendnace-jwt-token') },
+      headers: { "Content-Type": "application/json", "authorization": Cookies.get('attendnace-jwt-token') },
       //withCredentials: true,
       body: JSON.stringify({ students: records[i].students.sort() }),
     };
 
     fetch(`/backend/attendance/edit/${i}`, requestOptions).then((res) => {
-      console.log(res);
+      if (res.status == 401) {
+        this.props.setloading(true);
+        this.props.history.push("/");
+        this.props.setloading(false);
+      }
     });
   };
 
@@ -151,16 +158,15 @@ const AttendanceHistory = (props) => {
           return result;
         }, {})
     );
-    //console.log(records);
-    //console.log([records]);
-
-    //setCounts(updateCount());
-    //console.log(counts);
-    // console.log(records);
+   e.log(records);
 
     axios
-      .get(`/backend/attendance/delete/${i}`, {headers: { "authorization": Cookies.get('attendnace-jwt-token') }})
-      .then((res) => console.log(res))
+      .get(`/backend/attendance/delete/${i}`, { headers: { "authorization": Cookies.get('attendnace-jwt-token') } })
+      .then((res) => {if (res.status == 401) {
+        this.props.setloading(true);
+        this.props.history.push("/");
+        this.props.setloading(false);
+      }})
       .catch((err) => console.log(err));
   };
 
@@ -250,13 +256,13 @@ const AttendanceHistory = (props) => {
                     ) : null}
                   </th>
                 ) : (
-                  <th>
-                    {new Date(records[i].date).toDateString()}{" "}
-                    {beginDelete ? (
-                      <DeleteButton id={i} deleteRecord={deleteRecord} />
-                    ) : null}{" "}
-                  </th>
-                )
+                    <th>
+                      {new Date(records[i].date).toDateString()}{" "}
+                      {beginDelete ? (
+                        <DeleteButton id={i} deleteRecord={deleteRecord} />
+                      ) : null}{" "}
+                    </th>
+                  )
               )}
 
               {Object.keys(records).length > 0 ? <th>Total Present</th> : null}
@@ -275,45 +281,45 @@ const AttendanceHistory = (props) => {
                 </td>
                 {Object.keys(records).length > 0
                   ? Object.keys(records).map((i) => (
-                      <td>
-                        {records[i].editable ? (
-                          <input
-                            type="checkbox"
-                            defaultChecked={
-                              records[i].students.includes(student.roll_no)
-                                ? true
-                                : false
-                            }
-                            // value={
-                            //   records[i].students.includes(student.roll_no)
-                            //     ? "present"
-                            //     : "absent"
-                            // }
-                            id={`checkbox${i}_${student.roll_no}`}
-                            onChange={() => handleChange(i, student.roll_no)}
-                          />
-                        ) : records[i].students.includes(student.roll_no) ? (
-                          <strong
-                            style={{
-                              color: "green",
-                              fontWeight: "bold",
-                            }}
-                          >
-                            {" "}
+                    <td>
+                      {records[i].editable ? (
+                        <input
+                          type="checkbox"
+                          defaultChecked={
+                            records[i].students.includes(student.roll_no)
+                              ? true
+                              : false
+                          }
+                          // value={
+                          //   records[i].students.includes(student.roll_no)
+                          //     ? "present"
+                          //     : "absent"
+                          // }
+                          id={`checkbox${i}_${student.roll_no}`}
+                          onChange={() => handleChange(i, student.roll_no)}
+                        />
+                      ) : records[i].students.includes(student.roll_no) ? (
+                        <strong
+                          style={{
+                            color: "green",
+                            fontWeight: "bold",
+                          }}
+                        >
+                          {" "}
                             P
-                          </strong>
-                        ) : (
-                          <strong
-                            style={{
-                              color: "red",
-                              fontWeight: "bold",
-                            }}
-                          >
-                            A
-                          </strong>
-                        )}
-                      </td>
-                    ))
+                        </strong>
+                      ) : (
+                            <strong
+                              style={{
+                                color: "red",
+                                fontWeight: "bold",
+                              }}
+                            >
+                              A
+                            </strong>
+                          )}
+                    </td>
+                  ))
                   : null}
                 {Object.keys(records).length > 0 ? (
                   <td>

@@ -108,10 +108,16 @@ function TakeAttendance(props) {
                 },
                 
             })
-            .then(() =>
+            .then((res) =>
+            {if (res.status == 401) {
+                this.props.setloading(true);
+                this.props.history.push("/");
+                this.props.setloading(false);
+              }
                 props.history.push(
                     `/history/${data.classes[0].id}/${selectedSubject}/${selectedClass}`
                 )
+            }
             );
     }
 

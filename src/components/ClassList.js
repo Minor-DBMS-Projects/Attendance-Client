@@ -38,6 +38,11 @@ const ClassList = (props) => {
                 },
             })
             .then((response) => {
+                if (response.status == 401) {
+                    this.props.setloading(true);
+                    this.props.history.push("/");
+                    this.props.setloading(false);
+                  }
                 props.history.push({
                     pathname: "/new/student/namelist",
                     state: {

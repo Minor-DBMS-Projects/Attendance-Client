@@ -17,7 +17,11 @@ class Visualization extends Component {
                 `/backend/attendance/allRecord/${this.props.match.params.classId}/${this.props.match.params.subjectCode}/${this.props.match.params.classType}`, {headers: { "authorization": Cookies.get('attendnace-jwt-token') }}
             )
             .then((response) => {
-                console.log(response.data);
+                if (response.status == 401) {
+                    this.props.setloading(true);
+                    this.props.history.push("/");
+                    this.props.setloading(false);
+                  }
                 var studentWiseCount = [];
                 var dates = [];
                 var dateWiseCount = [];

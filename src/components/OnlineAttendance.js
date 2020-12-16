@@ -29,6 +29,11 @@ const OnlineAttendance = (props) => {
         axios
             .get("/backend/program",{headers:{"authorization": Cookies.get('attendnace-jwt-token')}})
             .then((response) => {
+                if (response.status == 401) {
+                    this.props.setloading(true);
+                    this.props.history.push("/");
+                    this.props.setloading(false);
+                  }
                 setProgram(response.data[0].id);
                 setProgramOptions(
                     response.data.map((eachProgram) => (
@@ -62,6 +67,11 @@ const OnlineAttendance = (props) => {
             })
 
             .then((response) => {
+                if (response.status == 401) {
+                    this.props.setloading(true);
+                    this.props.history.push("/");
+                    this.props.setloading(false);
+                  }
                 if (
                     response.data.classes === undefined ||
                     response.data.classes.length === 0
@@ -103,6 +113,11 @@ const OnlineAttendance = (props) => {
                 },
             })
             .then((response) => {
+                if (response.status == 401) {
+                    this.props.setloading(true);
+                    this.props.history.push("/");
+                    this.props.setloading(false);
+                  }
                 if (
                     response.data.subjects === undefined ||
                     response.data.subjects.length === 0
@@ -161,6 +176,11 @@ const OnlineAttendance = (props) => {
                     },
                 })
                 .then((response) => {
+                    if (response.status == 401) {
+                        this.props.setloading(true);
+                        this.props.history.push("/");
+                        this.props.setloading(false);
+                      }
                     var class_groups_temp = [
                         ...new Set(
                             response.data.classes.map(
@@ -231,6 +251,11 @@ const OnlineAttendance = (props) => {
                     },
                 })
                 .then((response) => {
+                    if (response.status == 401) {
+                        this.props.setloading(true);
+                        this.props.history.push("/");
+                        this.props.setloading(false);
+                      }
                     var parts = [
                         ...new Set(
                             response.data.subjects.map(
@@ -280,6 +305,11 @@ const OnlineAttendance = (props) => {
                     },
                 })
                 .then((response) => {
+                    if (response.status == 401) {
+                        this.props.setloading(true);
+                        this.props.history.push("/");
+                        this.props.setloading(false);
+                      }
                     setSubject(
                         JSON.stringify([
                             response.data.subjects[0].code,
