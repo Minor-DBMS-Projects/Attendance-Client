@@ -18,8 +18,9 @@ import ClassDetails from "./components/ClassDetails";
 import OnlineAttendance from "./components/OnlineAttendance";
 import Visualization from "./components/Visualization";
 import VisualizationDetails from "./components/VisualizationDetails";
+import AttendanceSummary from "./components/AttendanceSummary";
 import "./App.css";
-import * as Cookies from 'js-cookie';
+import * as Cookies from "js-cookie";
 
 function App(props) {
     let history = useHistory();
@@ -33,15 +34,12 @@ function App(props) {
     };
 
     useEffect(() => {
-     
-        console.log(Cookies.get('attendnace-jwt-token'))
-        fetch(
-            "backend/authentication/authenticate", {headers: { "authorization": Cookies.get('attendnace-jwt-token') }}
-        )
+        console.log(Cookies.get("attendnace-jwt-token"));
+        fetch("backend/authentication/authenticate", {
+            headers: { authorization: Cookies.get("attendnace-jwt-token") },
+        })
             .then((response) => {
-              
                 if (response.status === 200) return response.json();
-                
             })
             .then((responseJson) => {
                 if (responseJson.authenticated) {
@@ -111,6 +109,13 @@ function App(props) {
                     <Route exact path="/online-attendance">
                         {authenticated ? (
                             <OnlineAttendance />
+                        ) : (
+                            <Redirect to="/" />
+                        )}
+                    </Route>
+                    <Route exact path="/attendance-summary">
+                        {authenticated ? (
+                            <AttendanceSummary />
                         ) : (
                             <Redirect to="/" />
                         )}

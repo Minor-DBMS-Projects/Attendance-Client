@@ -4,7 +4,7 @@ import "../App.css";
 import { withRouter } from "react-router-dom";
 import axios from "axios";
 import FadeIn from "react-fade-in";
-import * as Cookies from 'js-cookie';
+import * as Cookies from "js-cookie";
 
 function TakeAttendance(props) {
     // eslint-disable-next-line
@@ -104,22 +104,28 @@ function TakeAttendance(props) {
                 headers: {
                     "Content-Type":
                         "application/x-www-form-urlencoded;charset=UTF-8",
-                         "authorization": Cookies.get('attendnace-jwt-token') 
+                    authorization: Cookies.get("attendnace-jwt-token"),
                 },
-                
             })
-            .then((res) =>
-            {if (res.status == 401) {
-                this.props.setloading(true);
-                this.props.history.push("/");
-                this.props.setloading(false);
-              }
+            .then((res) => {
+                if (res.status === 401) {
+                    this.props.setloading(true);
+                    this.props.history.push("/");
+                    this.props.setloading(false);
+                }
                 props.history.push(
                     `/history/${data.classes[0].id}/${selectedSubject}/${selectedClass}`
-                )
-            }
-            );
+                );
+            });
     }
+
+    useEffect(() => {
+        if (data.classes[0].classType === "L") {
+            setSelectedClass("L");
+        } else if (data.classes[0].classType === "P") {
+            setSelectedClass("P");
+        }
+    }, [data]);
 
     useEffect(() => {
         window.scrollTo(0, 0);
