@@ -1,6 +1,6 @@
 import React from "react";
 import { withRouter } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import {
   MDBInput,
@@ -8,14 +8,14 @@ import {
   MDBTableBody,
   MDBTableHead,
   MDBBtn,
-  MDBDropdownToggle,
 } from "mdbreact";
 import ReactHTMLTableToExcel from "react-html-table-to-excel";
 import DeleteButton from "./DeleteButton";
 import FadeIn from "react-fade-in";
-import * as Cookies from 'js-cookie';
+import {AuthContext} from "../contexts/authContext"
 
 const AttendanceHistory = (props) => {
+  const[authenticated, setAuthenticated]= useContext(AuthContext)
   const [counts, setCounts] = useState({});
   const [details, setDetails] = useState({});
   const [records, setRecords] = useState({});
@@ -32,10 +32,11 @@ const AttendanceHistory = (props) => {
   const classType = props.match.params.classType;
 
   useEffect(() => {
+
     axios
-      .get(`/backend/attendance/all/${classId}/${subjectCode}/${classType}`, { headers: { "authorization": Cookies.get('attendnace-jwt-token') } })
+      .get(`/backend/attendance/all/${classId}/${subjectCode}/${classType}`)
       .then((res) => {
-        
+       console.log(res)
         var recs = res.data.records;
         Object.keys(recs).map((i) => {
           recs[i].editable = false;
@@ -47,12 +48,12 @@ const AttendanceHistory = (props) => {
 
         //setCounts(res.data.counts);
       })
-      .catch((err) => {console.log(err.status)
-      
-        if (err.status === 401) {
-          this.props.setloading(true);
-          this.props.history.push("/");
-          this.props.setloading(false);
+      .catch((err) => {
+        
+        if(err.response.status==401)
+        {
+          setAuthenticated(false)
+          props.history.push("/");
         }
       });
   }, [classId, subjectCode, classType]);
@@ -64,6 +65,7 @@ const AttendanceHistory = (props) => {
   }, [records]);
 
   const changeEditable = (i) => {
+    
     console.log("change editable called");
     var recs = { ...records };
     if (!recs[i].editable && !editing) {
@@ -126,51 +128,63 @@ const AttendanceHistory = (props) => {
   };
 
   const updateRecords = (i) => {
-    console.log("update records called");
-    var recs = { ...records };
-    recs[i].editable = false;
-    setRecords(recs);
-    //setTemprecords(recs);
-    setEditing(false);
-    setPresent([]);
-    setAbsent([]);
-    setVisited([]);
+    
+
 
     const requestOptions = {
       method: "POST",
-      headers: { "Content-Type": "application/json", "authorization": Cookies.get('attendnace-jwt-token') },
+      headers: { "Content-Type": "application/json"  },
       //withCredentials: true,
       body: JSON.stringify({ students: records[i].students.sort() }),
     };
 
     fetch(`/backend/attendance/edit/${i}`, requestOptions).then((res) => {
-      if (res.status == 401) {
-        this.props.setloading(true);
-        this.props.history.push("/");
-        this.props.setloading(false);
+      if(res.status==401)
+      { alert("You must be logged in first!")
+        setAuthenticated(false)
+        props.history.push("/");
       }
-    });
+      console.log(res)
+      var recs = { ...records };
+      recs[i].editable = false;
+      setRecords(recs);
+      //setTemprecords(recs);
+      setEditing(false);
+      setPresent([]);
+      setAbsent([]);
+      setVisited([]);
+
+    })
+    .catch((err) => {  
+     
+      if(err.response.status==401)
+      { alert("You must be logged in first!")
+        setAuthenticated(false)
+        props.history.push("/");
+      }});
   };
 
   var deleteRecord = (i) => {
-    setRecords(
-      Object.keys(records)
-        .filter((key) => key != i)
-        .reduce((result, current) => {
-          result[current] = records[current];
-          return result;
-        }, {})
-    );
-  
 
     axios
-      .get(`/backend/attendance/delete/${i}`, { headers: { "authorization": Cookies.get('attendnace-jwt-token') } })
-      .then((res) => {if (res.status == 401) {
-        this.props.setloading(true);
-        this.props.history.push("/");
-        this.props.setloading(false);
-      }})
-      .catch((err) => console.log(err));
+      .get(`/backend/attendance/delete/${i}`)
+      .then((res) => {
+        setRecords(
+          Object.keys(records)
+            .filter((key) => key != i)
+            .reduce((result, current) => {
+              result[current] = records[current];
+              return result;
+            }, {})
+        );
+      })
+      .catch((err) => {
+        if(err.response.status==401)
+        { alert("You must be logged in first!")
+          setAuthenticated(false)
+          props.history.push("/");
+        }
+       });
   };
 
   const updateCount = () => {

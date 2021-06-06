@@ -1,12 +1,14 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { MDBTable, MDBTableBody, MDBTableHead, MDBBtn } from "mdbreact";
 import "../App.css";
 import { withRouter } from "react-router-dom";
 import axios from "axios";
 import FadeIn from "react-fade-in";
-import * as Cookies from "js-cookie";
+import { AuthContext } from "../contexts/authContext"
+
 
 function TakeAttendance(props) {
+    const [authenticated, setAuthenticated] = useContext(AuthContext);
     // eslint-disable-next-line
     const [data, setData] = useState(props.location.state.data);
     const [selectedClass, setSelectedClass] = useState("L");
@@ -104,18 +106,22 @@ function TakeAttendance(props) {
                 headers: {
                     "Content-Type":
                         "application/x-www-form-urlencoded;charset=UTF-8",
-                    authorization: Cookies.get("attendnace-jwt-token"),
                 },
             })
             .then((res) => {
-                if (res.status === 401) {
-                    this.props.setloading(true);
-                    this.props.history.push("/");
-                    this.props.setloading(false);
-                }
                 props.history.push(
                     `/history/${data.classes[0].id}/${selectedSubject}/${selectedClass}`
-                );
+                )
+            }
+            )
+            .catch((err) => {
+
+                if (err.response.status == 401) {
+                    alert("You must be logged in first!")
+                    setAuthenticated(false)
+                    props.history.push("/");
+                }
+
             });
     }
 

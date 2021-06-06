@@ -1,12 +1,14 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { MDBContainer, MDBRow, MDBCol, MDBBtn } from "mdbreact";
 import "../App.css";
 import axios from "axios";
 import { withRouter } from "react-router-dom";
 import FadeIn from "react-fade-in";
-import * as Cookies from 'js-cookie';
+import { AuthContext } from "../contexts/authContext";
+
 
 const OnlineAttendance = (props) => {
+    const [authenticated, setAuthenticated]= useContext(AuthContext);
     const [isClassValid, setIsClassValid] = useState(true);
     const [isSubjectValid, setIsSubjectValid] = useState(true);
     const [isFileValid, setIsFileValid] = useState(true);
@@ -27,13 +29,8 @@ const OnlineAttendance = (props) => {
 
     useEffect(() => {
         axios
-            .get("/backend/program",{headers:{"authorization": Cookies.get('attendnace-jwt-token')}})
+            .get("/backend/program")
             .then((response) => {
-                if (response.status == 401) {
-                    this.props.setloading(true);
-                    this.props.history.push("/");
-                    this.props.setloading(false);
-                  }
                 setProgram(response.data[0].id);
                 setProgramOptions(
                     response.data.map((eachProgram) => (
@@ -43,7 +40,7 @@ const OnlineAttendance = (props) => {
                     ))
                 );
             })
-            .catch((err) => alert("Check your network connection"));
+            .catch((err) => {})
     }, []);
 
     useEffect(() => {
@@ -62,16 +59,10 @@ const OnlineAttendance = (props) => {
                 headers: {
                     "Content-Type":
                         "application/x-www-form-urlencoded;charset=UTF-8",
-                        "authorization": Cookies.get('attendnace-jwt-token')
                 },
             })
 
             .then((response) => {
-                if (response.status == 401) {
-                    this.props.setloading(true);
-                    this.props.history.push("/");
-                    this.props.setloading(false);
-                  }
                 if (
                     response.data.classes === undefined ||
                     response.data.classes.length === 0
@@ -109,15 +100,9 @@ const OnlineAttendance = (props) => {
                 headers: {
                     "Content-Type":
                         "application/x-www-form-urlencoded;charset=UTF-8",
-                         "authorization": Cookies.get('attendnace-jwt-token')
                 },
             })
             .then((response) => {
-                if (response.status == 401) {
-                    this.props.setloading(true);
-                    this.props.history.push("/");
-                    this.props.setloading(false);
-                  }
                 if (
                     response.data.subjects === undefined ||
                     response.data.subjects.length === 0
@@ -172,15 +157,10 @@ const OnlineAttendance = (props) => {
                     headers: {
                         "Content-Type":
                             "application/x-www-form-urlencoded;charset=UTF-8",
-                            "authorization": Cookies.get('attendnace-jwt-token')
+                         
                     },
                 })
                 .then((response) => {
-                    if (response.status == 401) {
-                        this.props.setloading(true);
-                        this.props.history.push("/");
-                        this.props.setloading(false);
-                      }
                     var class_groups_temp = [
                         ...new Set(
                             response.data.classes.map(
@@ -219,7 +199,7 @@ const OnlineAttendance = (props) => {
                         ))
                     );
                 })
-                .catch((err) => {
+                .catch((err) => { 
                     setSection("");
                     setSectionOptions([]);
                 });
@@ -247,15 +227,10 @@ const OnlineAttendance = (props) => {
                     headers: {
                         "Content-Type":
                             "application/x-www-form-urlencoded;charset=UTF-8",
-                            "authorization": Cookies.get('attendnace-jwt-token') 
+                        
                     },
                 })
                 .then((response) => {
-                    if (response.status == 401) {
-                        this.props.setloading(true);
-                        this.props.history.push("/");
-                        this.props.setloading(false);
-                      }
                     var parts = [
                         ...new Set(
                             response.data.subjects.map(
@@ -272,7 +247,7 @@ const OnlineAttendance = (props) => {
                         ))
                     );
                 })
-                .catch((err) => {
+                .catch((err) => { 
                     setPart("");
                     setPartOptions([]);
                 });
@@ -301,15 +276,10 @@ const OnlineAttendance = (props) => {
                     headers: {
                         "Content-Type":
                             "application/x-www-form-urlencoded;charset=UTF-8",
-                            "authorization": Cookies.get('attendnace-jwt-token')
+                         
                     },
                 })
                 .then((response) => {
-                    if (response.status == 401) {
-                        this.props.setloading(true);
-                        this.props.history.push("/");
-                        this.props.setloading(false);
-                      }
                     setSubject(
                         JSON.stringify([
                             response.data.subjects[0].code,
@@ -330,7 +300,7 @@ const OnlineAttendance = (props) => {
                         ))
                     );
                 })
-                .catch((err) => {
+                .catch((err) => { 
                     setSubject("");
                     setSubjectOptions([]);
                 });
@@ -362,15 +332,20 @@ const OnlineAttendance = (props) => {
                 .post("/backend/attendance/takeOnlineNext", formData, {
                     headers: {
                         "Content-Type": "multipart/form-data",
-                         "authorization": Cookies.get('attendnace-jwt-token') 
+                        
                     },
                 })
-                .then(() => {
+                .then((res) => {
+                    
                     props.history.push("/");
                 })
-                .catch((err) =>
-                    alert("Unexpected error while fetching attendance")
-                );
+                .catch((err) => { 
+                    if(err.response.status==401)
+                { alert("You must be logged in first!")
+                  setAuthenticated(false)
+                  props.history.push("/");
+                }
+                });
         }
     }
 

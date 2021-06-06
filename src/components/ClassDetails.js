@@ -1,12 +1,13 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { MDBContainer, MDBRow, MDBCol, MDBBtn } from "mdbreact";
 import "../App.css";
 import axios from "axios";
 import { withRouter } from "react-router-dom";
 import FadeIn from "react-fade-in";
-import * as Cookies from 'js-cookie';
+import {AuthContext} from "../contexts/authContext"
 
 const ClassDetails = (props) => {
+    const [authenticated, setAuthenticated]=useContext(AuthContext)
     const [isClassValid, setIsClassValid] = useState(true);
     const [isSubjectValid, setIsSubjectValid] = useState(true);
     const [subject, setSubject] = useState("");
@@ -24,13 +25,9 @@ const ClassDetails = (props) => {
 
     useEffect(() => {
         axios
-            .get("/backend/program", {headers: { "authorization": Cookies.get('attendnace-jwt-token') }})
+            .get("/backend/program")
             .then((response) => {
-                if (response.status == 401) {
-                    this.props.setloading(true);
-                    this.props.history.push("/");
-                    this.props.setloading(false);
-                  }
+
                 setProgram(response.data[0].id);
                 setProgramOptions(
                     response.data.map((eachProgram) => (
@@ -40,7 +37,8 @@ const ClassDetails = (props) => {
                     ))
                 );
             })
-            .catch((err) => alert("Check your network connection"));
+            .catch((err) => {
+            });
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
@@ -60,16 +58,12 @@ const ClassDetails = (props) => {
                 headers: {
                     "Content-Type":
                         "application/x-www-form-urlencoded;charset=UTF-8",
-                        "authorization": Cookies.get('attendnace-jwt-token')
+
                 },
             })
 
             .then((response) => {
-                if (response.status == 401) {
-                    this.props.setloading(true);
-                    this.props.history.push("/");
-                    this.props.setloading(false);
-                  }
+
                 if (
                     response.data.classes === undefined ||
                     response.data.classes.length === 0
@@ -101,21 +95,16 @@ const ClassDetails = (props) => {
                 setBatch("");
                 setBatchOptions([]);
             });
-
         axios
             .post("/backend/subject/getSubject", formBody, {
                 headers: {
                     "Content-Type":
                         "application/x-www-form-urlencoded;charset=UTF-8",
-                        "authorization": Cookies.get('attendnace-jwt-token')
+
                 },
             })
             .then((response) => {
-                if (response.status == 401) {
-                    this.props.setloading(true);
-                    this.props.history.push("/");
-                    this.props.setloading(false);
-                  }
+
                 if (
                     response.data.subjects === undefined ||
                     response.data.subjects.length === 0
@@ -170,15 +159,11 @@ const ClassDetails = (props) => {
                     headers: {
                         "Content-Type":
                             "application/x-www-form-urlencoded;charset=UTF-8",
-                            "authorization": Cookies.get('attendnace-jwt-token')
+
                     },
                 })
                 .then((response) => {
-                    if (response.status == 401) {
-                        this.props.setloading(true);
-                        this.props.history.push("/");
-                        this.props.setloading(false);
-                      }
+
                     var class_groups = [
                         ...new Set(
                             response.data.classes.map(
@@ -227,15 +212,10 @@ const ClassDetails = (props) => {
                     headers: {
                         "Content-Type":
                             "application/x-www-form-urlencoded;charset=UTF-8",
-                            "authorization": Cookies.get('attendnace-jwt-token')
+
                     },
                 })
                 .then((response) => {
-                    if (response.status == 401) {
-                        this.props.setloading(true);
-                        this.props.history.push("/");
-                        this.props.setloading(false);
-                      }
                     var parts = [
                         ...new Set(
                             response.data.subjects.map(
@@ -281,15 +261,10 @@ const ClassDetails = (props) => {
                     headers: {
                         "Content-Type":
                             "application/x-www-form-urlencoded;charset=UTF-8",
-                             "authorization": Cookies.get('attendnace-jwt-token')
+
                     },
                 })
                 .then((response) => {
-                    if (response.status == 401) {
-                        this.props.setloading(true);
-                        this.props.history.push("/");
-                        this.props.setloading(false);
-                      }
                     setSubject(
                         JSON.stringify([
                             response.data.subjects[0].code,
@@ -340,15 +315,10 @@ const ClassDetails = (props) => {
                     headers: {
                         "Content-Type":
                             "application/x-www-form-urlencoded;charset=UTF-8",
-                            "authorization": Cookies.get('attendnace-jwt-token')
+
                     },
                 })
                 .then((response) => {
-                    if (response.status == 401) {
-                        this.props.setloading(true);
-                        this.props.history.push("/");
-                        this.props.setloading(false);
-                      }
                     props.history.push({
                         pathname: "/new/student/namelist",
                         state: {
@@ -356,8 +326,11 @@ const ClassDetails = (props) => {
                         },
                     });
                 })
-                .catch((err) =>
-                    alert("Unexpected error while fetching attendance")
+                .catch((err) => {
+                    alert("You must be logged in first!")
+                    setAuthenticated(false)
+                    props.history.push("/");
+                }
                 );
         }
     }

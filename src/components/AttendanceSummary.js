@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import {
     MDBContainer,
     MDBRow,
@@ -14,9 +14,10 @@ import "../App.css";
 import axios from "axios";
 import { withRouter } from "react-router-dom";
 import FadeIn from "react-fade-in";
-import * as Cookies from "js-cookie";
+import {AuthContext} from "../contexts/authContext"
 
 const AttendanceSummary = (props) => {
+    const [authenticated, setAuthenticated]=useContext(AuthContext)
     const [isClassValid, setIsClassValid] = useState(true);
     const [isSubjectValid, setIsSubjectValid] = useState(true);
     const [selectFilter, setSelectFilter] = useState(false);
@@ -37,7 +38,6 @@ const AttendanceSummary = (props) => {
     useEffect(() => {
         axios
             .get("/backend/program", {
-                headers: { authorization: Cookies.get("attendnace-jwt-token") },
             })
             .then((response) => {
                 if (response.status === 401) {
@@ -74,7 +74,6 @@ const AttendanceSummary = (props) => {
                 headers: {
                     "Content-Type":
                         "application/x-www-form-urlencoded;charset=UTF-8",
-                    authorization: Cookies.get("attendnace-jwt-token"),
                 },
             })
 
@@ -121,7 +120,6 @@ const AttendanceSummary = (props) => {
                 headers: {
                     "Content-Type":
                         "application/x-www-form-urlencoded;charset=UTF-8",
-                    authorization: Cookies.get("attendnace-jwt-token"),
                 },
             })
             .then((response) => {
@@ -184,7 +182,7 @@ const AttendanceSummary = (props) => {
                     headers: {
                         "Content-Type":
                             "application/x-www-form-urlencoded;charset=UTF-8",
-                        authorization: Cookies.get("attendnace-jwt-token"),
+
                     },
                 })
                 .then((response) => {
@@ -241,7 +239,7 @@ const AttendanceSummary = (props) => {
                     headers: {
                         "Content-Type":
                             "application/x-www-form-urlencoded;charset=UTF-8",
-                        authorization: Cookies.get("attendnace-jwt-token"),
+
                     },
                 })
                 .then((response) => {
@@ -294,7 +292,7 @@ const AttendanceSummary = (props) => {
                     headers: {
                         "Content-Type":
                             "application/x-www-form-urlencoded;charset=UTF-8",
-                        authorization: Cookies.get("attendnace-jwt-token"),
+
                     },
                 })
                 .then((response) => {
@@ -341,7 +339,7 @@ const AttendanceSummary = (props) => {
                     headers: {
                         "Content-Type":
                             "application/x-www-form-urlencoded;charset=UTF-8",
-                        authorization: Cookies.get("attendnace-jwt-token"),
+
                     },
                 })
                 .then((response) => {
@@ -352,7 +350,11 @@ const AttendanceSummary = (props) => {
                     }
                     setSummary(response.data);
                 })
-                .catch((err) => alert("Unexpected error"));
+                .catch((err) =>{ 
+                    alert("You must be logged in first!")
+                    setAuthenticated(false)
+                    props.history.push("/");
+            });
         }
         // eslint-disable-next-line
     }, [program, batch, section]);
@@ -534,7 +536,7 @@ const AttendanceSummary = (props) => {
                                               : "Practical"}
                                       </td>
                                       <td>{eachSubject.name}</td>
-                                      <td>{eachSubject.average}</td>
+                                      <td>{Math.round(eachSubject.average/0.24)}%</td>
                                   </tr>
                               ))
                             : summary
@@ -550,7 +552,7 @@ const AttendanceSummary = (props) => {
                                                   : "Practical"}
                                           </td>
                                           <td>{eachSubject.name}</td>
-                                          <td>{eachSubject.average}</td>
+                                          <td>{Math.round(eachSubject.average/0.24)}%</td>
                                       </tr>
                                   ))}
                     </MDBTableBody>

@@ -1,27 +1,24 @@
-import React, { Component } from "react";
+import React, { Component, useContext} from "react";
 import { HorizontalBar, Line } from "react-chartjs-2";
 import { MDBContainer, MDBTableBody, MDBTable, MDBTableHead } from "mdbreact";
 import { withRouter } from "react-router-dom";
 import axios from "axios";
-import * as Cookies from 'js-cookie';
+import {AuthContext} from "../contexts/authContext"
 
 class Visualization extends Component {
+    static contextType=AuthContext;
     constructor(props) {
         super(props);
         this.state = {};
     }
     
     componentDidMount() {
+        const [authenticated, setAuthenticated] = this.context
         axios
             .get(
-                `/backend/attendance/allRecord/${this.props.match.params.classId}/${this.props.match.params.subjectCode}/${this.props.match.params.classType}`, {headers: { "authorization": Cookies.get('attendnace-jwt-token') }}
+                `/backend/attendance/allRecord/${this.props.match.params.classId}/${this.props.match.params.subjectCode}/${this.props.match.params.classType}`
             )
             .then((response) => {
-                if (response.status == 401) {
-                    this.props.setloading(true);
-                    this.props.history.push("/");
-                    this.props.setloading(false);
-                  }
                 var studentWiseCount = [];
                 var dates = [];
                 var dateWiseCount = [];
@@ -124,7 +121,14 @@ class Visualization extends Component {
                         ],
                     },
                 });
-            });
+            })
+            .catch((err) => {
+          
+                if (err.response.status == 401) {
+                    alert("You must be logged in first!")
+                    setAuthenticated(false)
+                }
+             });
     }
 
     barChartOptions = {

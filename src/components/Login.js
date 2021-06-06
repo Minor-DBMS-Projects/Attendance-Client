@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useContext } from "react";
 import { withRouter } from "react-router-dom";
+import {AuthContext} from "../contexts/authContext"
 
 import {
   MDBContainer,
@@ -12,7 +13,7 @@ import {
 import * as Cookies from 'js-cookie';
 
 const Login = (props) => {
-
+  const [authenticated, setAuthenticated]=useContext(AuthContext);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [invalid, setInvalid] = useState(false);
@@ -33,8 +34,8 @@ const Login = (props) => {
        
         if (res.token)
         {
-          Cookies.set('attendnace-jwt-token', res.token, { expires: 1/48, path: '' });
-          props.setAuthenticated(true);
+          Cookies.set('attendance-jwt-token', res.token, { expires: 1/48, path: '' });
+         setAuthenticated(true);
           props.history.push("/dashboard");
         }
         else{
@@ -42,7 +43,10 @@ const Login = (props) => {
         }
         
       })
-      .catch((err) => console.log(err));
+      .catch((err) =>{ 
+        setInvalid(true);
+
+    });
 
   };
   return (

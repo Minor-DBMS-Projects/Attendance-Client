@@ -1,11 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useContext } from "react";
 import { MDBListGroupItem, MDBBtn } from "mdbreact";
 import "../App.css";
 import { withRouter, Redirect, Link } from "react-router-dom";
 import axios from "axios";
-import * as Cookies from 'js-cookie';
+import {AuthContext} from "../contexts/authContext"
 
 const ClassList = (props) => {
+    const [authenticated, setAuthenticated]=useContext(AuthContext)
     const viewAttendance = () => {
         props.history.push(
             `/history/${props.attendance.class}/${props.attendance.subjectCode}/${props.attendance.classType}`
@@ -34,15 +35,11 @@ const ClassList = (props) => {
                 headers: {
                     "Content-Type":
                         "application/x-www-form-urlencoded;charset=UTF-8",
-                        "authorization": Cookies.get('attendnace-jwt-token')
+                        
                 },
             })
             .then((response) => {
-                if (response.status == 401) {
-                    this.props.setloading(true);
-                    this.props.history.push("/");
-                    this.props.setloading(false);
-                  }
+               
                 props.history.push({
                     pathname: "/new/student/namelist",
                     state: {
@@ -50,7 +47,13 @@ const ClassList = (props) => {
                     },
                 });
             })
-            .catch((errorMsg) => console.log(errorMsg.response));
+            .catch((err) => {
+                if(err.response.status==401)
+                { alert("You must be logged in first!")
+                  setAuthenticated(false)
+                  props.history.push("/");
+                }
+             })
     };
 
     return (

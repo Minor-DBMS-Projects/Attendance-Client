@@ -1,26 +1,26 @@
-import React, { useState, useEffect } from "react";
-import { withRouter, Redirect } from "react-router-dom";
+import React, { useState, useEffect, useContext } from "react";
+import { withRouter} from "react-router-dom";
 import axios from "axios";
 import { MDBContainer, MDBListGroup } from "mdbreact";
 import "../App.css";
 import ClassList from "./ClassList";
-import * as Cookies from 'js-cookie';
-
-const Dashboard = () => {
+import {AuthContext} from '../contexts/authContext'
+const Dashboard = (props) => {
+    const[authenticated, setAuthenticated]=useContext(AuthContext);
     const [attendanceData, setattendanceData] = useState([]);
     useEffect(() => {
         axios
-            .get("/backend/attendance/getRecent/30", {headers: { "authorization": Cookies.get('attendnace-jwt-token') }})
+            .get("/backend/attendance/getRecent/30")
             .then((res) => {
-                console.log(res.status)
-                if (res.status ===401) {
-                    this.props.setloading(true);
-                    this.props.history.push("/");
-                    this.props.setloading(false);
-                  }
+            
                 setattendanceData(res.data);
             })
-            .catch((err) => console.log(err));
+            .catch((err) => { if (err.response.status ===401) {
+                setAuthenticated(false)
+                props.setloading(true);
+                props.history.push("/");
+                props.setloading(false);
+              }});
      
         return () => console.log("unmounting...");
     }, [setattendanceData]);

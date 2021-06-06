@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import {
     BrowserRouter as Router,
     Switch,
     Route,
-    Link,
     useHistory,
     Redirect,
 } from "react-router-dom";
@@ -20,11 +19,12 @@ import Visualization from "./components/Visualization";
 import VisualizationDetails from "./components/VisualizationDetails";
 import AttendanceSummary from "./components/AttendanceSummary";
 import "./App.css";
-import * as Cookies from "js-cookie";
+import { AuthContext } from "./contexts/authContext";
 
-function App(props) {
+function App() {
+    
+    const [authenticated, setAuthenticated] = useContext(AuthContext);
     let history = useHistory();
-    const [authenticated, setAuthenticated] = useState(false);
     const [loading, setloading] = useState(true);
     const style = {
         position: "fixed",
@@ -34,18 +34,22 @@ function App(props) {
     };
 
     useEffect(() => {
-        console.log(Cookies.get("attendnace-jwt-token"));
-        fetch("backend/authentication/authenticate", {
-            headers: { authorization: Cookies.get("attendnace-jwt-token") },
-        })
+
+        fetch(
+            "backend/authentication/authenticate"
+        )
             .then((response) => {
                 if (response.status === 200) return response.json();
+                if (response.status === 401) return response.json();
             })
             .then((responseJson) => {
+
                 if (responseJson.authenticated) {
+
                     setAuthenticated(true);
                     setloading(false);
                 } else {
+                    console.log(responseJson)
                     setAuthenticated(false);
                     setloading(false);
                 }
@@ -53,7 +57,6 @@ function App(props) {
             .catch((error) => {
                 setAuthenticated(false);
                 setloading(false);
-                console.log(error);
             });
     }, []);
 
@@ -70,8 +73,6 @@ function App(props) {
         <Router>
             <div className="container-fluid">
                 <Header
-                    authenticated={authenticated}
-                    setAuthenticated={setAuthenticated}
                     setloading={setloading}
                 />
                 <Switch>
@@ -79,22 +80,22 @@ function App(props) {
                         {authenticated ? (
                             <Redirect to="/dashboard" />
                         ) : (
-                            <FadeIn>
-                                <Login
-                                    authenticated={authenticated}
-                                    setAuthenticated={setAuthenticated}
-                                />{" "}
-                            </FadeIn>
-                        )}
+                                <FadeIn>
+                                    <Login
+
+                                    />{" "}
+                                </FadeIn>
+                            )}
                     </Route>
                     <Route exact path="/dashboard">
                         {authenticated ? (
                             <FadeIn>
-                                <Dashboard />{" "}
+                                <Dashboard
+                                    setloading={setloading} />{" "}
                             </FadeIn>
                         ) : (
-                            <Redirect to="/" />
-                        )}
+                                <Redirect to="/" />
+                            )}
                     </Route>
                     <Route exact path="/class-details">
                         {authenticated ? <ClassDetails /> : <Redirect to="/" />}
@@ -103,22 +104,22 @@ function App(props) {
                         {authenticated ? (
                             <VisualizationDetails />
                         ) : (
-                            <Redirect to="/" />
-                        )}
+                                <Redirect to="/" />
+                            )}
                     </Route>
                     <Route exact path="/online-attendance">
                         {authenticated ? (
                             <OnlineAttendance />
                         ) : (
-                            <Redirect to="/" />
-                        )}
+                                <Redirect to="/" />
+                            )}
                     </Route>
                     <Route exact path="/attendance-summary">
                         {authenticated ? (
                             <AttendanceSummary />
                         ) : (
-                            <Redirect to="/" />
-                        )}
+                                <Redirect to="/" />
+                            )}
                     </Route>
                     <Route
                         exact
@@ -127,8 +128,8 @@ function App(props) {
                         {authenticated ? (
                             <Visualization />
                         ) : (
-                            <Redirect to="/" />
-                        )}
+                                <Redirect to="/" />
+                            )}
                     </Route>
 
                     <Route
@@ -138,8 +139,8 @@ function App(props) {
                             authenticated ? (
                                 <TakeAttendance {...props} />
                             ) : (
-                                <Redirect to="/" />
-                            )
+                                    <Redirect to="/" />
+                                )
                         }
                     />
 
@@ -148,10 +149,10 @@ function App(props) {
                         path="/history/:classId/:subjectCode/:classType"
                     >
                         {authenticated ? (
-                            <AttendanceHistory {...props} />
+                            <AttendanceHistory  />
                         ) : (
-                            <Redirect to="/" />
-                        )}
+                                <Redirect to="/" />
+                            )}
                     </Route>
                 </Switch>
             </div>

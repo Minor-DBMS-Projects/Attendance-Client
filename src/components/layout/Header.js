@@ -4,14 +4,11 @@ import Navigation from "./Navigation";
 import "mdbreact/dist/css/mdb.css";
 
 class Header extends Component {
-  j;
   render() {
     const { location } = this.props;
     if (location.pathname.match("/history"))
       return (
         <Navigation
-          authenticated={this.props.authenticated}
-          setAuthenticated={this.props.setAuthenticated}
           setloading={this.props.setloading}
         />
       );
@@ -26,8 +23,6 @@ class Header extends Component {
           </h4>
 
           <Navigation
-            authenticated={this.props.authenticated}
-            setAuthenticated={this.props.setAuthenticated}
             setloading={this.props.setloading}
           />
         </div>

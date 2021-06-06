@@ -25,13 +25,8 @@ const VisualizationDetails = (props) => {
 
     useEffect(() => {
         axios
-            .get("/backend/program", {headers: { "authorization": Cookies.get('attendnace-jwt-token') }})
+            .get("/backend/program")
             .then((response) => {
-                if (response.status === 401) {
-                    this.props.setloading(true);
-                    this.props.history.push("/");
-                    this.props.setloading(false);
-                  }
                 setProgram(response.data[0].id);
                 setProgramOptions(
                     response.data.map((eachProgram) => (
@@ -41,7 +36,7 @@ const VisualizationDetails = (props) => {
                     ))
                 );
             })
-            .catch((err) => alert("Check your network connection"));
+            .catch((err) => { })
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
@@ -61,16 +56,10 @@ const VisualizationDetails = (props) => {
                 headers: {
                     "Content-Type":
                         "application/x-www-form-urlencoded;charset=UTF-8",
-                        "authorization": Cookies.get('attendnace-jwt-token') 
                 },
             })
 
             .then((response) => {
-                if (response.status === 401) {
-                    this.props.setloading(true);
-                    this.props.history.push("/");
-                    this.props.setloading(false);
-                  }
                 if (
                     response.data.classes === undefined ||
                     response.data.classes.length === 0
@@ -97,7 +86,7 @@ const VisualizationDetails = (props) => {
                     );
                 }
             })
-            .catch((err) => {
+            .catch((err) => { 
                 setIsClassValid(false);
                 setBatch("");
                 setBatchOptions([]);
@@ -108,15 +97,9 @@ const VisualizationDetails = (props) => {
                 headers: {
                     "Content-Type":
                         "application/x-www-form-urlencoded;charset=UTF-8",
-                        "authorization": Cookies.get('attendnace-jwt-token')
                 },
             })
             .then((response) => {
-                if (response.status === 401) {
-                    this.props.setloading(true);
-                    this.props.history.push("/");
-                    this.props.setloading(false);
-                  }
                 if (
                     response.data.subjects === undefined ||
                     response.data.subjects.length === 0
@@ -143,7 +126,7 @@ const VisualizationDetails = (props) => {
                     );
                 }
             })
-            .catch((err) => {
+            .catch((err) => { 
                 setIsSubjectValid(false);
                 setYear("");
                 setYearOptions([]);
@@ -171,7 +154,6 @@ const VisualizationDetails = (props) => {
                     headers: {
                         "Content-Type":
                             "application/x-www-form-urlencoded;charset=UTF-8",
-                            "authorization": Cookies.get('attendnace-jwt-token')
                     },
                 })
                 .then((response) => {
@@ -228,15 +210,9 @@ const VisualizationDetails = (props) => {
                     headers: {
                         "Content-Type":
                             "application/x-www-form-urlencoded;charset=UTF-8",
-                             "authorization": Cookies.get('attendnace-jwt-token')
                     },
                 })
                 .then((response) => {
-                    if (response.status === 401) {
-                        this.props.setloading(true);
-                        this.props.history.push("/");
-                        this.props.setloading(false);
-                      }
                     var parts = [
                         ...new Set(
                             response.data.subjects.map(
@@ -253,7 +229,7 @@ const VisualizationDetails = (props) => {
                         ))
                     );
                 })
-                .catch((err) => {
+                .catch((err) => { 
                     setPart("");
                     setPartOptions([]);
                 });
@@ -282,15 +258,9 @@ const VisualizationDetails = (props) => {
                     headers: {
                         "Content-Type":
                             "application/x-www-form-urlencoded;charset=UTF-8",
-                            "authorization": Cookies.get('attendnace-jwt-token') 
                     },
                 })
                 .then((response) => {
-                    if (response.status === 401) {
-                        this.props.setloading(true);
-                        this.props.history.push("/");
-                        this.props.setloading(false);
-                      }
                     setSubject(
                         JSON.stringify([
                             response.data.subjects[0].code,
@@ -311,7 +281,7 @@ const VisualizationDetails = (props) => {
                         ))
                     );
                 })
-                .catch((err) => {
+                .catch((err) => { 
                     setSubject("");
                     setSubjectOptions([]);
                 });
@@ -337,15 +307,9 @@ const VisualizationDetails = (props) => {
                     headers: {
                         "Content-Type":
                             "application/x-www-form-urlencoded;charset=UTF-8",
-                            "authorization": Cookies.get('attendnace-jwt-token')
                     },
                 })
                 .then((response) => {
-                    if (response.status === 401) {
-                        this.props.setloading(true);
-                        this.props.history.push("/");
-                        this.props.setloading(false);
-                      }
                     const classId = response.data.classes.filter(
                         (eachClass) => eachClass.class_group === section
                     )[0].id;
@@ -354,7 +318,7 @@ const VisualizationDetails = (props) => {
                         `/visualization/${classId}/${subjectCode}/${classType}`
                     );
                 })
-                .catch((err) => alert("Failed to submit"));
+                .catch((err) => { })
         }
     }
 
